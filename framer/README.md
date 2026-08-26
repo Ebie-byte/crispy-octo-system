@@ -11,6 +11,7 @@ components used on the homepage, so they can be reviewed and restored.
 | `code/ContainImage.tsx` | `ContainImage.tsx` | Contain-fit image, used for the promise photo and the gift-box card. |
 | `code/HeroProduct.tsx` | `HeroProduct.tsx` | The hero roll: contain-fit image plus entrance, float and scroll parallax. |
 | `code/HeroAmbience.tsx` | `HeroAmbience.tsx` | The hero's glow (behind) and film grain (on top). |
+| `code/MenuCardMedia.tsx` | `MenuCardMedia.tsx` | The photograph in each menu card: staggered scroll reveal, contained hover zoom, warm shadow. |
 
 ## Notes for future edits
 
@@ -201,3 +202,41 @@ playful; this brand reads weighted. The staggered text reveal is better done
 in Framer's own Appear panel (select layer, Effects, Appear) than as a code
 wrapper — wrapping the hero text in a component would make it far harder to
 edit on the canvas for no visual gain.
+
+
+## Menu section
+
+Five cards, each one `MenuCardMedia` (photo) plus a badge medallion and two
+text layers that stay as ordinary Framer layers.
+
+**The hover is the point.** The photo scales inside a clipped frame — the
+frame never moves, only the image behind it grows. Scaling the whole card
+instead would make it read as a button; containing the movement is what
+reads as expensive. 1.06 over 0.7s, on the same hard-decelerating ease as
+the hero.
+
+**The reveal is staggered by `index`.** Each card carries its position
+(0-4) and delays by `index x 0.07s`, so they arrive as a sequence rather
+than a block. It fires `once` — cards settle and stay settled; re-running
+on every scroll pass is a classic tell of a cheap template.
+
+**The shadow is warm** (`rgba(60, 44, 24, ...)`), not grey. On a cream page
+a neutral shadow reads as dirt. It deepens on hover, so the card lifts.
+
+Text is deliberately outside the component so it keeps its project text
+styles and stays editable on the canvas.
+
+### Typography pass
+
+- `/H2Dark` tracking `-0.04em` to `-0.015em`. Playfair at 44px was set
+  tight enough that the letters were nearly touching.
+- `/CardTitle` 14px/0.8px to 13px/1.7px. Small uppercase wants air; tight
+  tracking at that size reads as a UI label rather than a menu heading.
+- `/CardBody` line-height 1.5 to 1.75.
+
+### Still worth doing
+
+The section header and the VIEW FULL MENU button have no motion. Both are
+better done in Framer's own Effects panel (Appear for the header, a hover
+variant for the button) than as code — wrapping the text in components
+would cost editability for no visual gain.
