@@ -12,6 +12,8 @@ components used on the homepage, so they can be reviewed and restored.
 | `code/HeroProduct.tsx` | `HeroProduct.tsx` | The hero roll: contain-fit image plus entrance, float and scroll parallax. |
 | `code/HeroAmbience.tsx` | `HeroAmbience.tsx` | The hero's glow (behind) and film grain (on top). |
 | `code/MenuCardMedia.tsx` | `MenuCardMedia.tsx` | The photograph in each menu card: staggered scroll reveal, contained hover zoom, warm shadow. |
+| `code/StarRating.tsx` | `StarRating.tsx` | Solid gold star row for the testimonials; stars tick on one by one. |
+| `code/PopupRow.tsx` | `PopupRow.tsx` | One row of the pop-up schedule, with a hover arrow. |
 
 ## Notes for future edits
 
@@ -240,3 +242,53 @@ The section header and the VIEW FULL MENU button have no motion. Both are
 better done in Framer's own Effects panel (Appear for the header, a hover
 variant for the button) than as code — wrapping the text in components
 would cost editability for no visual gain.
+
+
+## Sections added after the stats band
+
+Page order and the z-index sequence (see the sticky-stack note above — this
+must keep ascending):
+
+| Section | node | z-index |
+| --- | --- | --- |
+| Hero (navy) | `mQeEOl4C8` | 0 |
+| Menu (cream, sticky) | `EFIHjHtK0` | 1 |
+| Promise (navy) | `vpnrIIJAT` | 2 |
+| Stats (cream) | `HC4ErToYO` | 3 |
+| Testimonials (navy) | `jWMHGjaJb` | 4 |
+| Pop-ups (cream) | `XWvcqPkfu` | 5 |
+| Footer (navy) | `jMLOVuSQv` | 6 |
+
+The navy/cream alternation is deliberate and now runs the length of the
+page.
+
+**Testimonials** are three columns split by hairline rules rather than
+boxed cards — boxes would fight the menu cards directly above. Quotes are
+Playfair *italic*, which is the one place italic appears on the page, so
+the reviews read as spoken rather than set.
+
+**Pop-ups** are an editorial list: date block, venue, hours, area, and an
+arrow that slides 6px on hover. Row copy lives in component props because
+the schedule changes weekly — four fields in the properties panel beats
+four nested text layers, and the row's internal alignment cannot drift as
+the copy changes. `past` dims a row instead of deleting it.
+
+**Footer** is four columns over a hairline, with the logo lockup rebuilt
+from the same text styles and swirl icon as the header.
+
+### PLACEHOLDER COPY — replace before launch
+
+These are deliberately obvious placeholders, not filler to ship:
+
+- **Testimonial quotes and names.** All three read "Paste a real review
+  here" and are attributed to "Customer Name". Replace with real reviews.
+  Inventing testimonials would be fabricating social proof.
+- **Pop-up dates** are all `00`, and the venues are the two named on the
+  Instagram (Florida Road, The Luxe Affair) as examples only.
+- **Footer contact** reads "WhatsApp · add number" and "Email · add
+  address". The Instagram link is real and live.
+
+The stats band above claims "2,000+ Happy Customers" and "5 star Loved &
+Rated"; the testimonials exist to back those numbers up. Publishing the
+placeholders would leave the claims still unsupported and add three fake
+reviews on top.
