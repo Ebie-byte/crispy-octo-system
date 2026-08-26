@@ -51,6 +51,24 @@ Two things break that effect, and both were present at one point:
    which clips the feathered negative space. `ContainImage.tsx` renders it
    with `object-fit: contain` instead.
 
-To swap the asset: select the hero `ContainImage` layer, and set the **Image**
-property using Framer's image picker (drag the PNG into the Assets panel
-first). The picker takes precedence over the `or URL` fallback field.
+The correct PNG is now in place:
+`https://framerusercontent.com/images/SISuNgc06ZvAEPYXs9Vt2cTR44.png`
+(1602x1134, aspect 1.413). The hero frame is set to 552px tall so that at its
+780px max width the image fits exactly, with no letterboxing.
+
+### Getting a new asset URL from over MCP
+
+An agent working through the Framer MCP cannot upload an image: it has no
+network access to Framer's CDN, and cannot populate the object-shaped
+`ResponsiveImage` picker prop from XML. The way around it, which is how the
+hero PNG got here:
+
+1. Drag the image anywhere onto the Framer canvas. It uploads and becomes a
+   loose layer with a real `framerusercontent.com` URL.
+2. Leave that layer selected. The agent reads it with `getSelectedNodesXml`,
+   which reports the uploaded URL.
+3. The agent writes that URL into the target layer's `src`, then deletes the
+   loose layer.
+
+Deleting the loose layer does not break anything: the CDN URL is permanent and
+independent of whether any layer references it.
