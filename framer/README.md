@@ -136,10 +136,18 @@ top of it and hides it. The disc is opaque, which is what makes the cover
 work. That means the overlay's position is load-bearing, not decorative:
 
 - frame `qRpFQ1q9Y` is 870 x 552
-- seal is 155px, pinned `top: 154px`, flushed right with `padding-right: 78px`
+- seal is 200px, pinned `top: 131px`, flushed right with `padding-right: 55px`
 - centre lands at roughly (715, 231), i.e. 82% across and 42% down
 
-It is deliberately a little larger than the printed badge (~144px) so it
-covers it with a few pixels to spare. **If the promise photo is ever replaced,
+It is deliberately larger than the printed badge (~144px) so it covers it
+with room to spare.
+
+**Keep the seal square, and resize it in pairs.** The row is flushed right,
+so the centre is `870 - padding-right - width/2`. Changing the width alone
+walks the seal sideways off the badge it is hiding; the top pin and the row
+height have to move with it too. To resize to width `w` and keep the centre:
+`padding-right = 715 - w/2`, `top = 231 - w/2`, `row height = w`. A
+non-square box does not distort the disc (the viewBox letterboxes it) but it
+does shift the centre, which is what matters here. **If the promise photo is ever replaced,
 re-check this alignment** — a badge-free photo would be better, and then the
 size can drop back to ~145px.
