@@ -5,6 +5,11 @@
 // divided by hairlines read as a printed schedule; boxes would read as a
 // dashboard.
 //
+// These rows enter from the LEFT rather than rising. Every other section
+// on the page reveals upward, so a sideways entrance gives the schedule
+// its own signature and makes it read as a list being dealt out, line by
+// line, rather than another grid of things fading up.
+//
 // Text lives in props rather than in child Framer layers because these
 // rows change every week — editing four fields in the properties panel is
 // faster than editing four nested text layers, and it keeps the row's
@@ -70,6 +75,8 @@ export default function PopupRow({
     const shouldReveal = !motionOff
     const shouldHover = !motionOff && !past
 
+    const settled = past ? 0.45 : 1
+
     const wrapper: CSSProperties = {
         position: "relative",
         width: "100%",
@@ -79,7 +86,6 @@ export default function PopupRow({
         gap: 28,
         padding: "26px 4px",
         borderBottom: `1px solid ${rule}`,
-        opacity: past ? 0.45 : 1,
         ...style,
     }
 
@@ -91,14 +97,14 @@ export default function PopupRow({
             animate={shouldReveal && !inView ? "hidden" : "shown"}
             whileHover={shouldHover ? "hover" : undefined}
             variants={{
-                hidden: { opacity: 0, y: 18 },
-                shown: { opacity: past ? 0.45 : 1, y: 0 },
-                hover: { opacity: past ? 0.45 : 1, y: 0 },
+                hidden: { opacity: 0, x: -32 },
+                shown: { opacity: settled, x: 0 },
+                hover: { opacity: settled, x: 0 },
             }}
             transition={{
-                duration: 0.75,
+                duration: 0.8,
                 ease: SETTLE,
-                delay: shouldReveal ? Math.max(0, index) * 0.08 : 0,
+                delay: shouldReveal ? Math.max(0, index) * 0.1 : 0,
             }}
         >
             {/* date block */}

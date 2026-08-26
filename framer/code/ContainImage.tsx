@@ -1,32 +1,37 @@
-// Renders an image scaled with object-fit: contain, so it is never cropped
-// or stretched.
+// Contain-fit image with an optional scroll parallax.
 //
-// Why this exists: Framer's native Image node has no exposed "Fit" vs "Fill"
-// attribute in this project's XML API — it always crops to cover. The hero
-// product shot is a transparent PNG with feathered edges, composited with
-// negative space around the roll so it melts into the navy background. A
-// cover crop clips that negative space and breaks the effect, so the hero
-// must be drawn with "contain".
+// Why contain: Framer's native Image node has no exposed "Fit" vs "Fill"
+// attribute in this project's XML API — it always crops to cover. Photos
+// composited with negative space around the subject lose that space to the
+// crop, so they are drawn here instead.
 //
-// Two ways to set the image, checked in this order:
-//   1. `image`  — Framer's normal image picker. USE THIS. Drag the asset in
-//                 and it is uploaded to Framer's CDN like any other asset.
-//   2. `src`    — a plain URL string. Fallback only, because the MCP's XML
-//                 writer can only round-trip scalar prop values and silently
-//                 drops the {src, srcSet, alt} object `image` expects, so an
-//                 agent editing over MCP cannot populate the picker.
+// The parallax drifts the photograph UPWARD as the section scrolls past,
+// against the page direction. In the promise section the copy column moves
+// with the page and the photograph resists it, which opens a little depth
+// between the two without either of them leaving its box. Set to 0 to
+// switch it off.
 //
-// IMPORTANT: the hero asset must stay a PNG. JPG has no alpha channel, so
-// saving it as JPG bakes in a solid background box and the roll stops
-// blending into the navy.
+// Takes a plain string URL rather than Framer's ResponsiveImage control:
+// the MCP's XML writer only round-trips scalar prop values and silently
+// drops the {src, srcSet, alt} object ResponsiveImage expects. The `image`
+// picker is still exposed for editing by hand on the canvas, and wins when
+// it is set.
 
-import { addPropertyControls, ControlType } from "framer"
+import { addPropertyControls, ControlType, useIsStaticRenderer } from "framer"
+import {
+    motion,
+    useReducedMotion,
+    useScroll,
+    useTransform,
+} from "framer-motion"
+import { useRef } from "react"
 import type { CSSProperties } from "react"
 
 interface ContainImageProps {
     image?: { src: string; srcSet?: string; alt?: string }
-    src: string
-    alt: string
+    src?: string
+    alt?: string
+    parallax?: number
     style?: CSSProperties
 }
 
@@ -36,45 +41,61 @@ interface ContainImageProps {
  * @framerSupportedLayoutWidth any-prefer-fixed
  * @framerSupportedLayoutHeight any-prefer-fixed
  */
-export default function ContainImage(props: ContainImageProps) {
-    const { image, src, alt, style } = props
+export default function ContainImage({
+    image,
+    src = "",
+    alt = "",
+    parallax = 0,
+    style,
+}: ContainImageProps) {
+    const ref = useRef<HTMLDivElement>(null)
+
+    const isStatic = useIsStaticRenderer()
+    const prefersReducedMotion = useReducedMotion()
+    const motionOff = isStatic || prefersReducedMotion
+
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start end", "end start"],
+    })
+
+    const drift = motionOff ? 0 : parallax
+    const y = useTransform(scrollYProgress, [0, 1], [drift, -drift])
 
     const wrapperStyle: CSSProperties = {
         position: "relative",
         width: "100%",
         height: "100%",
+        overflow: "hidden",
         ...style,
     }
 
-    // The picker wins when it has been set; otherwise fall back to the URL.
     const resolvedSrc = image?.src || src
     const resolvedAlt = alt || image?.alt || ""
 
     if (!resolvedSrc) {
-        return <div style={wrapperStyle} />
+        return <div ref={ref} style={wrapperStyle} />
     }
 
     return (
-        <div style={wrapperStyle}>
-            <img
+        <div ref={ref} style={wrapperStyle}>
+            <motion.img
                 src={resolvedSrc}
                 srcSet={image?.src ? image.srcSet : undefined}
                 alt={resolvedAlt}
                 style={{
                     width: "100%",
-                    height: "100%",
+                    // Overscan so the drift never exposes an edge.
+                    height: drift ? `calc(100% + ${Math.abs(drift) * 2}px)` : "100%",
+                    marginTop: drift ? -Math.abs(drift) : 0,
                     objectFit: "contain",
                     objectPosition: "center",
                     display: "block",
+                    y,
                 }}
             />
         </div>
     )
-}
-
-ContainImage.defaultProps = {
-    src: "",
-    alt: "",
 }
 
 addPropertyControls(ContainImage, {
@@ -91,5 +112,15 @@ addPropertyControls(ContainImage, {
         type: ControlType.String,
         title: "Alt text",
         defaultValue: "",
+    },
+    parallax: {
+        type: ControlType.Number,
+        title: "Parallax",
+        min: 0,
+        max: 120,
+        step: 5,
+        unit: "px",
+        defaultValue: 0,
+        description: "Drift against the scroll. 0 is off.",
     },
 })

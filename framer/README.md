@@ -14,6 +14,8 @@ components used on the homepage, so they can be reviewed and restored.
 | `code/MenuCardMedia.tsx` | `MenuCardMedia.tsx` | The photograph in each menu card: staggered scroll reveal, contained hover zoom, warm shadow. |
 | `code/StarRating.tsx` | `StarRating.tsx` | Solid gold star row for the testimonials; stars tick on one by one. |
 | `code/PopupRow.tsx` | `PopupRow.tsx` | One row of the pop-up schedule, with a hover arrow. |
+| `code/CountUp.tsx` | `CountUp.tsx` | Stat figures that count up on entering view. |
+| `code/PhotoCard.tsx` | `PhotoCard.tsx` | A photograph mounted on a white board with a caption. |
 
 ## Notes for future edits
 
@@ -292,3 +294,50 @@ The stats band above claims "2,000+ Happy Customers" and "5 star Loved &
 Rated"; the testimonials exist to back those numbers up. Publishing the
 placeholders would leave the claims still unsupported and add three fake
 reviews on top.
+
+
+## One scroll signature per section
+
+The brief was that each section should do something of its own on the way
+down. Repeating a single fade-up the length of a page is what makes a site
+feel templated, so no two sections enter the same way:
+
+| Section | Signature |
+| --- | --- |
+| Hero | Product settles in, floats, parallaxes; grain over the whole band |
+| Menu | Cards stagger **upward**; photo zooms inside a fixed frame on hover |
+| Promise | Photograph drifts **against** the scroll; seal ring rotates |
+| Stats | Figures **count up** from zero |
+| Testimonials | Stars **tick on one by one**; quotes set in italic |
+| Pop-ups | Rows slide in **from the left**; arrow slides on hover |
+| Footer | Static — the page has arrived, and should stop |
+
+The footer being still is deliberate. Something has to be the end.
+
+### CountUp
+
+Takes the finished string ("2,000+", "100%") and animates only the number
+inside it, keeping the prefix and suffix. Values with no digits
+("Premium") render as plain text, so all four stats use one component and
+stay typographically identical.
+
+It counts on a MotionValue rendered directly as a child, so the React tree
+does **not** re-render per frame — only the text node updates. A useState
+counter would re-render the whole band ~60 times a second.
+
+Note this replaced four text layers, so those figures no longer use the
+`/StatNumber` text style; the typography is matched inside the component
+and exposed as `fontSize` / `color` props.
+
+### PhotoCard
+
+White board, an even mat around the photo, caption printed on the board.
+The mat is the point: a photo bled to the card edge reads as a web
+thumbnail, the same photo inset on board reads as something mounted. On
+hover the board lifts while the photo scales inside its window — the board
+and mat never move, so it stays an object rather than becoming a button.
+
+**The two images in the pop-ups section are stand-ins**, borrowed from the
+menu cards (the event tray and the drinks cup). They need replacing with
+actual photographs of the pop-up stand. The captions describe the service,
+not the photo, so they stay true either way.
