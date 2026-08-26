@@ -8,7 +8,9 @@ components used on the homepage, so they can be reviewed and restored.
 | --- | --- | --- |
 | `code/CibonIcon.tsx` | `CibonIcon.tsx` | Every stroke icon on the page — hero feature column, service bar, menu-card badges, stats row, button arrows, nav bag, logo swirl. |
 | `code/FreshDailySeal.tsx` | `FreshDailySeal.tsx` | The circular "Fresh Daily / Premium Quality" seal over the promise photograph. Its lettering ring rotates; see below. |
-| `code/ContainImage.tsx` | `ContainImage.tsx` | Renders the hero product photo with `object-fit: contain` so it can never be cropped or stretched — see note below. |
+| `code/ContainImage.tsx` | `ContainImage.tsx` | Contain-fit image, used for the promise photo and the gift-box card. |
+| `code/HeroProduct.tsx` | `HeroProduct.tsx` | The hero roll: contain-fit image plus entrance, float and scroll parallax. |
+| `code/HeroAmbience.tsx` | `HeroAmbience.tsx` | The hero's glow (behind) and film grain (on top). |
 
 ## Notes for future edits
 
@@ -151,3 +153,51 @@ non-square box does not distort the disc (the viewBox letterboxes it) but it
 does shift the centre, which is what matters here. **If the promise photo is ever replaced,
 re-check this alignment** — a badge-free photo would be better, and then the
 size can drop back to ~145px.
+
+
+## Hero motion
+
+The brief was "wow", and the restraint is deliberate. Cheap motion never
+stops moving; expensive motion has one moment and then rests. The hero
+animates on arrival, then settles to almost nothing — only a 6px float and
+the seal's lettering ring keep breathing.
+
+`HeroProduct` runs three motions on the same axis, so they are **nested, not
+combined** — parallax outside, entrance in the middle, float inside. All
+three animate `y`; on a single element the last writer would win.
+
+The entrance easing is doing most of the work: `cubic-bezier(0.16, 1, 0.3,
+1)`. It decelerates hard, so the roll *settles* instead of sliding to a
+stop. Default browser easing is the single biggest reason motion reads as
+cheap.
+
+`HeroAmbience` is two layers, both `pointer-events: none`:
+
+- **glow** — a radial bloom *behind* the content (`zIndex 0`) so the roll
+  looks lit rather than pasted on flat colour. Breathes on a 9s opacity
+  cycle; nothing geometric moves.
+- **grain** — SVG `feTurbulence` at **3.5%** over everything (`zIndex 9`).
+  This is the cheapest luxury signal there is: flat colour fields read
+  digital, a little noise reads as printed material. Above ~6% it stops
+  looking like texture and starts looking like a broken image.
+
+All of it idles on the Framer canvas, under `prefers-reduced-motion`, and
+while scrolled out of view.
+
+### Two MCP gotchas hit while wiring this
+
+- **`left` will not set on a `ComponentInstance`.** Both ambience layers
+  came out at `left: -300px` and refused to move. Plain Frames accept it
+  fine, so each instance is wrapped in an absolutely positioned Frame that
+  carries the pin. Same class of problem as `maxWidth` and `borderRadius`.
+- **Adding a child reorders it to the end.** The glow has to paint *behind*
+  the content, so after inserting it the whole child order must be restated
+  explicitly, or an explicit `zIndex` on a later sibling wins anyway.
+
+### What was deliberately not built
+
+Particles, kinetic type, drifting shapes and anything springy. Bounce reads
+playful; this brand reads weighted. The staggered text reveal is better done
+in Framer's own Appear panel (select layer, Effects, Appear) than as a code
+wrapper — wrapping the hero text in a component would make it far harder to
+edit on the canvas for no visual gain.
