@@ -7,7 +7,7 @@ components used on the homepage, so they can be reviewed and restored.
 | File | Framer path | Used for |
 | --- | --- | --- |
 | `code/CibonIcon.tsx` | `CibonIcon.tsx` | Every stroke icon on the page — hero feature column, service bar, menu-card badges, stats row, button arrows, nav bag, logo swirl. |
-| `code/FreshDailySeal.tsx` | `FreshDailySeal.tsx` | The circular "Fresh Daily / Premium Quality" seal over the promise photograph. |
+| `code/FreshDailySeal.tsx` | `FreshDailySeal.tsx` | The circular "Fresh Daily / Premium Quality" seal over the promise photograph. Its lettering ring rotates; see below. |
 | `code/ContainImage.tsx` | `ContainImage.tsx` | Renders the hero product photo with `object-fit: contain` so it can never be cropped or stretched — see note below. |
 
 ## Notes for future edits
@@ -117,3 +117,29 @@ Changing it to `hidden` would silently kill the effect.
 Caveat: the pinned section is ~740px tall. On a viewport shorter than that,
 its lower edge (the VIEW FULL MENU button) is pinned out of reach. Fine on
 desktop; revisit if a mobile breakpoint is added.
+
+
+## The rotating seal, and the badge printed into the photo
+
+`FreshDailySeal` rotates only the **lettering ring**. The disc, the hairline
+rule and the centre swirl stay still — spinning the whole disc looks like a
+sticker, spinning just the type reads as a stamped foil seal.
+
+It idles rather than burning frames: no animation on the Framer canvas or in
+static/SSR renders (`useIsStaticRenderer`), none when the viewer has
+reduced-motion set (`useReducedMotion`), and none while scrolled out of view
+(`useInView`). Rotation is a CSS transform, so it stays on the compositor.
+
+**The promise photograph already has a seal printed into its pixels.** That
+baked-in badge cannot rotate, so the live component is positioned directly on
+top of it and hides it. The disc is opaque, which is what makes the cover
+work. That means the overlay's position is load-bearing, not decorative:
+
+- frame `qRpFQ1q9Y` is 870 x 552
+- seal is 155px, pinned `top: 154px`, flushed right with `padding-right: 78px`
+- centre lands at roughly (715, 231), i.e. 82% across and 42% down
+
+It is deliberately a little larger than the printed badge (~144px) so it
+covers it with a few pixels to spare. **If the promise photo is ever replaced,
+re-check this alignment** — a badge-free photo would be better, and then the
+size can drop back to ~145px.
