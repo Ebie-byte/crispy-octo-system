@@ -34,3 +34,23 @@ components used on the homepage, so they can be reviewed and restored.
   control, because the MCP's XML writer only round-trips scalar prop values
   (strings/numbers/colors) — it silently drops object-shaped props like the
   `{src, srcSet, alt}` that `ResponsiveImage` expects.
+
+## Hero image — must stay a PNG
+
+The hero product shot is a **transparent PNG** with feathered edges: the roll
+and pedestal are composited with negative space around them so the image melts
+into the navy background with no visible edge.
+
+Two things break that effect, and both were present at one point:
+
+1. **Saving it as JPG.** JPG has no alpha channel, so the transparency is
+   flattened into a solid background box. The asset originally wired into the
+   hero was `oiwCpeewMf2MzFN1JXDmZlzC5s.jpg` — already flattened. It must be
+   re-uploaded as PNG.
+2. **A cover crop.** Framer's native Image node always crops to cover here,
+   which clips the feathered negative space. `ContainImage.tsx` renders it
+   with `object-fit: contain` instead.
+
+To swap the asset: select the hero `ContainImage` layer, and set the **Image**
+property using Framer's image picker (drag the PNG into the Assets panel
+first). The picker takes precedence over the `or URL` fallback field.
