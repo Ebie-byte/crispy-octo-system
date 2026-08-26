@@ -83,3 +83,37 @@ hero PNG got here:
 
 Deleting the loose layer does not break anything: the CDN URL is permanent and
 independent of whether any layer references it.
+
+## Sticky section stacking (scroll effect)
+
+The cream "Indulge Your Way" section and the navy "Our Promise" section stack:
+on scroll the cream section pins to the top of the viewport and the navy
+section slides up over it.
+
+This is pure CSS, no JS:
+
+| Section | node | position | z-index |
+| --- | --- | --- | --- |
+| Hero (navy) | `mQeEOl4C8` | relative | 0 |
+| Menu (cream) | `EFIHjHtK0` | **sticky, top 0** | 1 |
+| Promise (navy) | `vpnrIIJAT` | relative | 2 |
+| Stats (cream) | `HC4ErToYO` | relative | 3 |
+
+Two things make it work, and both are easy to break:
+
+1. **The z-indexes must ascend across ALL four sections**, not just the two
+   being stacked. Raising only the promise section would make it paint over
+   the stats section below it too, since an explicit z-index beats the
+   `auto` of a later sibling. Any new section added below must continue the
+   sequence.
+2. **The covering section needs an opaque background.** Both use solid
+   colour styles. A transparent section would let the pinned one show
+   through.
+
+Note `overflow` on the page root is `clip`, not `hidden` — `clip` does not
+create a scroll container, so sticky still resolves against the viewport.
+Changing it to `hidden` would silently kill the effect.
+
+Caveat: the pinned section is ~740px tall. On a viewport shorter than that,
+its lower edge (the VIEW FULL MENU button) is pinned out of reach. Fine on
+desktop; revisit if a mobile breakpoint is added.
