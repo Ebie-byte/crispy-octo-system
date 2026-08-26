@@ -15,6 +15,17 @@ components used on the homepage, so they can be reviewed and restored.
 - Framer's XML writer in this MCP **cannot create `<SVG>` nodes** from an
   `svg="..."` attribute — the node is silently dropped. Use a code component
   and insert it as a `ComponentInstance` instead.
+- **`backgroundImage` cannot be written at all** over MCP — not on update, and
+  not on create either (creating a node with it yields a plain white frame).
+  Existing values read back fine, so it looks writable but is not; the write
+  is refused with "No changes were made". Every image placed by an agent
+  therefore goes through `ContainImage.tsx` with a `src` string. This is also
+  why the hero was a flattened `.jpg`: it had to be set by hand in the UI.
+- `maxWidth` does not apply to a `ComponentInstance`. Put the width cap on a
+  wrapper `Stack` and let the instance fill it — the hero, the promise photo
+  and the gift-box card all use that pattern. Likewise `borderRadius` does not
+  apply to an instance, so the gift-box card wraps it in a rounded frame with
+  `overflow="hidden"`.
 - The XML writer also ignores the `centerX` / `right` pins. To centre or
   right-align an absolutely positioned element, wrap it in a full-width
   absolute stack and use `stackDistribution`.
