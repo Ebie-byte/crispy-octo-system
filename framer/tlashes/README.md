@@ -106,3 +106,28 @@ double every decoration.
 Volume Set, Mega Volume, Lash Lift, Brow Shape). Those slots still render
 the blush placeholder. The delivered file numbering skips 03-07, which is
 presumably where they live.
+
+
+## Hero centrepiece: known desync after a plugin disconnect
+
+The Framer MCP plugin disconnected and reconnected mid-session once. After
+reconnecting, `getNodeXml` on the hero centrepiece slot (`vIks2Bb9X`)
+reported the WRONG child — the old, already-removed `09HeroFullBg` raw
+image layer (`GOyaodc7BbrlrGEiHAFSWFi8Fw.png`, the giant zoomed-eye asset)
+had silently reappeared as its child, even though a prior tool call's own
+diff had shown the correct `Photo` component in place. The correct state
+had genuinely been lost, not just misread.
+
+**Lesson: a diff returned by `updateXmlForNode` is not proof a change
+persists.** After any edit that matters, especially following a
+disconnect/reconnect, re-verify with a fresh `getNodeXml` call before
+telling the user it's fixed.
+
+**Also: writing a new child into a node that already has one does not
+replace it — it adds a sibling.** Fixing the hero required an explicit
+`deleteNode` on the stray old child, not just writing the correct one
+alongside it.
+
+Hero centrepiece is sized 610x724 (0.843 aspect, matching the source
+photograph exactly) — re-measured from the mockup as ~42% of the 1440px
+page width, replacing an earlier, too-small 440px guess.
