@@ -37,22 +37,37 @@ Two hard limits of the Framer MCP forced everything visual through code:
   `skyTop`, and `LogoBadge`'s ring-text props are `ringWordOne` /
   `ringWordTwo` for this reason (an intermediate `arcTop`/`arcBottom`
   naming still collided).
-- **`left` cannot be set on a `ComponentInstance` at all** — not on
-  create, not on update. `getNodeXml` reports a stray `left="-300px"` on
-  every instance regardless of what's requested; this appears to be a
-  read-back artifact rather than the true render, matching prior
-  first-hand findings on this project. Positioning is done on a wrapping
-  `Frame`, never on the instance's own pins.
+- **A `ComponentInstance` that is the sole child of a plain, absolutely
+  positioned `Frame` gets silently pinned `left: -300px`** (`-600px` in one
+  case) — and this is a REAL rendering shift, not a cosmetic read-back
+  artifact. It visibly skewed the hero backdrop, the header and footer logo
+  badges, and the hero portrait until it was found. `left` cannot be
+  corrected on the instance afterwards either: writing it is silently
+  ignored ("No changes were made"), and even deleting and recreating the
+  instance reproduces it.
+  **The fix: never wrap a lone instance in a plain `Frame`. Use a `Stack`**
+  (`layout="stack"`, `stackDistribution="center"`, `stackAlignment="center"`)
+  so the instance is a flow child rather than an absolutely pinned one. Icon
+  instances never hit this bug precisely because they were always dropped
+  into `Stack` layout parents.
 - **Absolute positioning with only two opposite pins (e.g. `bottom` +
   `right`) gets the missing pins defaulted to `0`**, stretching the node
   to fill its parent instead of sizing it from `width`/`height`. The
   floating years-badge is instead a full-size absolutely-positioned
   `Stack` with `stackDistribution="end"` / `stackAlignment="end"` to push
   its child into the corner.
-- **Reordering children via a bare self-closing tag list sometimes
-  silently no-ops** ("No changes were made") even when the requested
-  order differs from the current one. Restating the parent's own
-  attributes in the same call reliably forces the reorder to register.
+- **`borderWidth` / `borderStyle` / `borderColor` are silently dropped** on
+  `Frame` and `Stack` nodes — the write reports success and the attributes
+  simply never appear on read-back. Anything needing a hairline outline has
+  to draw it itself; this is why `Icon.tsx` has a `ring` mode that renders
+  the disc and its outline inside the SVG rather than relying on a bordered
+  wrapper.
+
+- **Reordering children only registers when the parent's own attributes are
+  restated in the same call.** A bare list of self-closing `nodeId` tags in
+  the desired order returns "No changes were made" even when the order
+  genuinely differs.
+
 - **Writing a `ComponentInstance` onto an existing node's `nodeId` does
   not convert its type** — the old node (e.g. a flat-colour `Frame`) stays
   a `Frame` and the insert is silently ignored. Delete the old node first,

@@ -2,6 +2,11 @@
 // column (lash, leaf, diamond), the four-step booking bar, the About stats row,
 // the footer contact rows and the button arrows. One component, one enum prop,
 // so all iconography on the page stays a single consistent line weight.
+//
+// The optional `ring` mode draws the disc and its hairline outline inside the
+// SVG. Framer's MCP silently drops borderWidth/borderStyle/borderColor on
+// Frame and Stack nodes, so a ringed icon cannot be built from a bordered
+// wrapper — it has to be drawn here.
 
 import { addPropertyControls, ControlType } from "framer"
 import type { CSSProperties, ReactNode } from "react"
@@ -27,6 +32,9 @@ interface IconProps {
     size: number
     color: string
     strokeWidth: number
+    ring: boolean
+    ringColor: string
+    discColor: string
     style?: CSSProperties
 }
 
@@ -125,7 +133,10 @@ const PATHS: Record<IconName, ReactNode> = {
  * @framerSupportedLayoutHeight any-prefer-fixed
  */
 export default function Icon(props: IconProps) {
-    const { name, size, color, strokeWidth, style } = props
+    const { name, size, color, strokeWidth, ring, ringColor, discColor, style } =
+        props
+
+    const glyph = PATHS[name] ?? PATHS.sparkle
 
     return (
         <div
@@ -139,21 +150,54 @@ export default function Icon(props: IconProps) {
                 ...style,
             }}
         >
-            <svg
-                width={size}
-                height={size}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={color}
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                focusable="false"
-                style={{ display: "block", color }}
-            >
-                {PATHS[name] ?? PATHS.sparkle}
-            </svg>
+            {ring ? (
+                // 48-unit box: disc at the edge, glyph centred at half scale.
+                <svg
+                    width={size}
+                    height={size}
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    aria-hidden="true"
+                    focusable="false"
+                    style={{ display: "block" }}
+                >
+                    <circle
+                        cx="24"
+                        cy="24"
+                        r="23.4"
+                        fill={discColor}
+                        stroke={ringColor}
+                        strokeWidth="1"
+                    />
+                    <g
+                        transform="translate(12 12)"
+                        stroke={color}
+                        strokeWidth={strokeWidth}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                        style={{ color }}
+                    >
+                        {glyph}
+                    </g>
+                </svg>
+            ) : (
+                <svg
+                    width={size}
+                    height={size}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                    style={{ display: "block", color }}
+                >
+                    {glyph}
+                </svg>
+            )}
         </div>
     )
 }
@@ -163,6 +207,9 @@ Icon.defaultProps = {
     size: 20,
     color: "#C08A63",
     strokeWidth: 1.3,
+    ring: false,
+    ringColor: "rgba(192, 138, 99, 0.22)",
+    discColor: "#FFFFFF",
 }
 
 addPropertyControls(Icon, {
@@ -224,5 +271,24 @@ addPropertyControls(Icon, {
         min: 0.5,
         max: 3,
         step: 0.1,
+    },
+    ring: {
+        type: ControlType.Boolean,
+        title: "Disc",
+        defaultValue: false,
+        enabledTitle: "On",
+        disabledTitle: "Off",
+    },
+    ringColor: {
+        type: ControlType.Color,
+        title: "Ring",
+        defaultValue: "rgba(192, 138, 99, 0.22)",
+        hidden: (p) => !p.ring,
+    },
+    discColor: {
+        type: ControlType.Color,
+        title: "Disc Color",
+        defaultValue: "#FFFFFF",
+        hidden: (p) => !p.ring,
     },
 })
