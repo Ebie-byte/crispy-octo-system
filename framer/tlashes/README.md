@@ -78,3 +78,31 @@ Two hard limits of the Framer MCP forced everything visual through code:
 Colours and text styles are Framer project styles (Color Styles /
 `ColorStyles`, `TextStyles`), matching the supplied asset kit:
 Playfair Display (headings), Dancing Script (accents), Montserrat (body/UI).
+
+## Live image assets
+
+Dragged onto the Framer canvas by the client, then referenced by URL from
+the `Photo` component's `src`. The loose canvas layers can be deleted — the
+CDN URL is permanent and independent of any layer referencing it.
+
+| Slot | Layer name | URL |
+| --- | --- | --- |
+| Header logo | `01Logo` | `.../NTwXbCfAyQcqyv1iYojYnDskRiA.png` |
+| Hero centrepiece | `02HeroEye` | `.../DP5ehkNCvrCamuFdApFQIPlF74c.png` |
+| About portrait | `08AboutTanith` | `.../TAGj9kejTPapOiS8GTKdDEpkI.png` |
+| Hero background | `09HeroFullBg` | `.../GOyaodc7BbrlrGEiHAFSWFi8Fw.png` |
+
+Unused decorative extras also on the canvas: `13HeroBgPedestal`,
+`14HeroBgFlowersVase`, `15HeroBgSparkle`, `16HeroBgGlowArch`.
+
+**`02HeroEye` is already fully composited** — the glow ring, marble podium,
+sparkles and `tl` monogram are baked into the photograph. `HeroPortrait.tsx`
+draws all of those itself, so it is deliberately NOT used on the page any
+more; the slot is a plain `Photo` sized to the image's native 0.843 aspect
+(440x522) so nothing is cropped. Re-introducing `HeroPortrait` here would
+double every decoration.
+
+**Still outstanding:** the five service-card photographs (Classic Set,
+Volume Set, Mega Volume, Lash Lift, Brow Shape). Those slots still render
+the blush placeholder. The delivered file numbering skips 03-07, which is
+presumably where they live.
