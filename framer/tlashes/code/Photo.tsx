@@ -3,6 +3,10 @@
 // attribute cannot be written over MCP, so images arrive here as a plain `src`
 // string. With no src it renders a designed blush placeholder rather than a
 // broken frame, so the layout reads correctly before the real photos land.
+//
+// `fit` matters: a photograph that is already composited (the hero eye, with
+// its glow ring, podium and monogram baked in) must be "contain" so none of
+// that composition is cropped away. Cards and portraits use "cover".
 
 import { addPropertyControls, ControlType } from "framer"
 import { motion } from "framer-motion"
@@ -12,6 +16,7 @@ import type { CSSProperties } from "react"
 interface PhotoProps {
     src: string
     alt: string
+    fit: "cover" | "contain"
     radius: number
     focalX: number
     focalY: number
@@ -35,6 +40,7 @@ export default function Photo(props: PhotoProps) {
     const {
         src,
         alt,
+        fit,
         radius,
         focalX,
         focalY,
@@ -75,7 +81,7 @@ export default function Photo(props: PhotoProps) {
                     style={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        objectFit: fit,
                         objectPosition: `${focalX}% ${focalY}%`,
                         display: "block",
                     }}
@@ -137,6 +143,7 @@ export default function Photo(props: PhotoProps) {
 Photo.defaultProps = {
     src: "",
     alt: "",
+    fit: "cover" as const,
     radius: 0,
     focalX: 50,
     focalY: 50,
@@ -154,6 +161,13 @@ addPropertyControls(Photo, {
         placeholder: "https://…",
     },
     alt: { type: ControlType.String, title: "Alt", defaultValue: "" },
+    fit: {
+        type: ControlType.Enum,
+        title: "Fit",
+        defaultValue: "cover",
+        options: ["cover", "contain"],
+        optionTitles: ["Fill", "Fit"],
+    },
     radius: {
         type: ControlType.Number,
         title: "Radius",
