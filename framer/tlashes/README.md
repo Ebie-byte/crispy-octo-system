@@ -327,3 +327,73 @@ row back to `width="100%"` of its column, tightening the gap (26px ->
 18px) to give the content more room to actually fit, and adding
 `stackWrap="true"` as a safety net so if it still doesn't fit on one
 line, it wraps to a second line instead of rendering outside the frame.
+
+## Hero motion: ControlType.Slot children cannot be attached over MCP
+
+The natural way to add entrance and hover motion is a wrapper component
+with a `ControlType.Slot` child, so the wrapped text/button stays a normal,
+editable Framer node underneath. **This does not work over Framer's MCP.**
+
+Three separate attempts, each verified afterwards with a fresh
+`getNodeXml` (never trusting the diff):
+
+1. Wrap an existing node by referencing its `nodeId` inside the new
+   instance's XML.
+2. Same, but restating the existing node's full attribute set.
+3. Create a brand-new text node inline inside the new wrapper.
+
+All three produced an **empty wrapper** with the content left unmoved. The
+`"Moved node X from parent Y to Z"` status messages are **false** — in case
+3 the new text node actually landed as a stray orphan on the page root.
+`getComponentInsertUrlAndTypes` on a slot-only component also reports no
+props at all, confirming the slot is simply not addressable from XML.
+
+Attempt 1 additionally **scrambled the hero copy order** (headline, script
+line and button were reordered to the end of the column) — so this failure
+mode is destructive, not just inert. It was fully restored.
+
+### The workaround: zero-size "driver" components
+
+The other obvious fallback — hardcoding the copy as string props on an
+animation component — was rejected: it costs inline canvas editing, and it
+forces every project text style (`/TL/H1`, `/TL/Script`, `/TL/Eyebrow`,
+`/ButtonLabel`) to be re-implemented as raw CSS, which is exactly how
+typography drifts away from the client's design. Note also that
+`getProjectXml` lists text styles **without their colour**, so a faithful
+re-implementation isn't even possible from the data available.
+
+Instead, both effects are `0x0`, absolutely positioned, invisible
+components dropped *beside* the content they animate:
+
+- **`StaggerIn.tsx`** (`ZdyRAoW`) — first child of the hero copy column
+  `AXVp0qKEb`, instance `VzaN6ZHbl`. On mount it reads its parent element,
+  filters to the siblings that actually carry content (so the spacer
+  `Frame`s are skipped and don't consume stagger slots), and runs a
+  fade + rise on each via the Web Animations API. Four real targets:
+  eyebrow, headline, script line, button. `fill: "backwards"` holds the
+  from-state through the delay so later items don't flash in first.
+- **`HoverLift.tsx`** (`Bnx0osA`) — child of the button stack
+  `dqbsrtHAW`, instance `Llm1SXtHf`. Walks up to the button element and
+  drives `transform` + `box-shadow` on pointer events: a 3px lift with a
+  rose-gold shadow bloom, pressing to `scale(0.98)` on pointerdown.
+
+Both climb out of any single-child ancestor first, so they still find the
+real designed node if Framer wraps a code component instance in a
+pass-through div. Both restore every style they touched on unmount, and
+both honour `prefers-reduced-motion`.
+
+Easing throughout is `cubic-bezier(0.16, 1, 0.3, 1)` — a slow expo-out that
+decelerates hard at the end, which is what makes the motion read as premium
+rather than mechanical.
+
+**These are skipped when `RenderTarget.current() === RenderTarget.canvas`**,
+deliberately: animations re-firing while you drag layers makes the canvas
+unusable. The motion only shows in **Preview** and on the published site,
+not in the Framer editor.
+
+### Pin drift on the driver instances
+
+Both drivers were written with `left="0px"` and came back with
+`left="720px"`. They are `0x0` and absolutely positioned, so this has no
+layout or visual effect, and a follow-up `updateXmlForNode` setting it back
+returned "No changes were made". Left as-is.
