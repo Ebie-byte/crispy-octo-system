@@ -243,3 +243,14 @@ the signal to strip to the most minimal possible diagnostic (one hardcoded
 solid colour, no props) and test structural properties of the wrapper
 (z-index, stacking order, sizing) instead — the content was never the
 problem.
+
+**Follow-up once it rendered: the backdrop only covered part of the hero.**
+The wrapper's height (620px) predates enlarging the hero eye image to
+640x649 earlier in the session — once that image grew, the hero content
+row (image + its 80px vertical padding, ~729px) plus the nav row pushed
+the section's real height well past 620px, so the backdrop simply ran out
+before the content did. Bumped the wrapper to 950px (generously oversized
+on purpose, since it is absolutely positioned behind everything and an
+overshoot into the next section blends fine given the base colour is
+already near-white). Whenever content that sits ON TOP of this backdrop
+changes height significantly, re-check whether 950px is still enough.
