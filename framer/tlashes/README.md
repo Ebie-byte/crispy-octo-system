@@ -22,11 +22,12 @@ Two hard limits of the Framer MCP forced everything visual through code:
 | File | Used for |
 | --- | --- |
 | `Icon.tsx` | Every stroke icon: hero feature column, booking-steps bar, About stats, footer contacts, button arrows. One enum prop keeps every icon on the page the same line weight. |
-| `Photo.tsx` | Every photograph slot. Hover-zoom on the service cards, contain/cover via `objectFit`, blush gradient + lash-mark placeholder when `src` is empty. |
+| `Photo.tsx` | Every photograph slot. Hover-zoom on the service cards, `fit` (cover/contain) via `objectFit`, blush gradient + lash-mark placeholder when `src` is empty. |
 | `HeroBackdrop.tsx` | The hero's blush gradient ground, light bloom behind the portrait, soft out-of-focus blossom clusters, and film grain. |
-| `HeroPortrait.tsx` | The hero's glowing ring, marble podium, and the framed eye photo at the centre. |
+| `HeroPortrait.tsx` | The hero's glowing ring, marble podium, and the framed eye photo at the centre. Used on the original `/` page only — see the two-page note below. |
 | `LogoBadge.tsx` | The circular "T LASHES / BY TANITH LEE" roundel (header, filled; footer, white-on-dark) — ring lettering via SVG `textPath`. |
 | `YearsBadge.tsx` | The white "2+ / Years Experience" disc on Tanith's portrait. |
+| `TLashesIcon.tsx` | A second icon set (`/t-lashes` page only) — eyelash/leaf/diamond/etc. Same `ring`-mode fix as `Icon.tsx`; see the two-page note. |
 
 ## MCP gotchas hit while building this
 
@@ -72,6 +73,31 @@ Two hard limits of the Framer MCP forced everything visual through code:
   not convert its type** — the old node (e.g. a flat-colour `Frame`) stays
   a `Frame` and the insert is silently ignored. Delete the old node first,
   then create the instance fresh.
+
+- **THE master gotcha, found late: a made-up `nodeId` on a node that is
+  meant to be NEW causes the whole call to silently no-op** ("No changes
+  were made"), even though the docs describe this correctly ("nodes
+  without a nodeId attribute will be created as new nodes"). Every earlier
+  "no changes" mystery in this file that involved creating a wrapper
+  `Frame`/`Stack` from scratch — not updating an existing one — was
+  probably this. **New nodes must omit `nodeId` entirely.** Once, this
+  produced a worse failure than a clean no-op: a call with an invented
+  `nodeId` for the OUTER wrapper (which then failed as "no changes") still
+  let the INNER `ComponentInstance` get created, but as a stray top-level
+  sibling of `<Desktop>` with the familiar artifact offset (`left:
+  -600px`/`-1200px`, scaling with call count) — floating off-canvas,
+  outside the actual page tree, invisible on the real page but real clutter
+  needing an explicit `deleteNode`. **Two things follow: (1) always omit
+  `nodeId` for new nodes, and (2) after ANY "no changes" response, check
+  `getSelectedNodesXml` or search the page for a stray same-shaped node
+  before assuming nothing happened.**
+
+- **A single `updateXmlForNode` call can only describe one node's own
+  subtree.** Giving it two sibling root tags — the target `nodeId` plus an
+  unrelated new node meant to become the target's sibling — silently
+  no-ops the whole call. To add a new sibling to an existing node, target
+  the *parent* and include the existing children plus the new one (new
+  child with `nodeId` omitted) all inside one root tag.
 
 ## Palette & type
 
@@ -131,3 +157,49 @@ alongside it.
 Hero centrepiece is sized 610x724 (0.843 aspect, matching the source
 photograph exactly) — re-measured from the mockup as ~42% of the 1440px
 page width, replacing an earlier, too-small 440px guess.
+
+## Two pages: `/` and `/t-lashes`
+
+The project now has a second web page, `/t-lashes` (nodeId `ts4pGk5Gs`),
+built later in the same session with its own parallel design system: a
+`TL/`-prefixed set of color and text styles (Sacramento script instead of
+Dancing Script, Poppins instead of Montserrat in places), and its own
+`TLashesIcon.tsx` icon set, alongside reused pieces of the original system
+(`/Rose`, `/Dark`, `/Cream`, `Icon.tsx`, `Photo.tsx`, `LogoBadge.tsx`,
+`YearsBadge.tsx`). It already has every real photograph wired in — hero,
+all five service cards, Tanith's portrait — and is structurally much
+closer to the mockup than the original `/` build.
+
+**`/` is still the older, less accurate page.** Framer serves `/` as the
+site's homepage by convention; nothing is published yet
+(`getProjectWebsiteUrl` returns null for both staging and production), so
+there's no live-traffic urgency, but `/` is not what a visitor would see
+as "the site" if published today. **The user has explicitly said not to
+touch the homepage question** — leave `/` and the `/` vs `/t-lashes`
+decision alone until asked.
+
+Two real bugs were found and fixed on `/t-lashes`:
+
+1. **The three hero feature-icon rings and the About years-badge weren't
+   rendering.** `TLashesIcon.tsx` only drew the glyph and relied on the
+   wrapping `Stack`'s `borderWidth`/`borderStyle`/`borderColor` for the
+   ring — exactly the attribute class that's silently dropped (see
+   above). Fixed by giving `TLashesIcon` the same `ring` mode as
+   `Icon.tsx` (disc + hairline drawn inside the SVG), and by swapping the
+   hand-built years-badge for the existing `YearsBadge.tsx` instance.
+2. **The hero background was five flat, hard-edged color bands stacked
+   with negative z-indexes** (`wg8P2mbAy`, `hYGCLm2hA`, `Mn89mj5mN`,
+   `EONzSbrn1`, `dvD4OPj4t` at 620/460/310/155/62px), not a real
+   gradient — which is exactly why it read as flat/banded rather than the
+   mockup's soft glow. Replaced with a single `HeroBackdrop.tsx` instance
+   (true CSS gradient, radial bloom, blurred blossom clusters, grain) and
+   deleted the four redundant bands.
+
+**`ContainImage` is not a code component.** The hero and About photos on
+`/t-lashes` use nodes tagged `<ContainImage src="..." alt="...">` with no
+`componentId` — `getComponentInsertUrlAndTypes` confirms these aren't
+component nodes at all. This is apparently a native Framer node type
+(object-fit: contain image) that the docs read at the start of this
+project didn't cover; the XML tag is just the layer's own name, same
+convention as `<TLashes backgroundImage="...">` elsewhere being a plain
+`Frame`. Nothing to fix or version here — it was already working.
