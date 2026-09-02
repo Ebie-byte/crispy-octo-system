@@ -40,14 +40,16 @@ export default function HeroBackdrop(props: HeroBackdropProps) {
 
     // One blossom cluster, reused mirrored on both edges. Petals are plain
     // ellipses pushed far out of focus, which is what sells depth here.
+    // Sized to actually read at page scale — at 1440px wide, anything under
+    // ~80px radius disappears into the blur before it registers as a shape.
     const cluster = (
         <g filter={`url(#${softId})`} fill={blossom}>
-            <ellipse cx="70" cy="60" rx="46" ry="34" opacity="0.85" />
-            <ellipse cx="130" cy="120" rx="38" ry="30" opacity="0.7" />
-            <ellipse cx="34" cy="150" rx="42" ry="32" opacity="0.75" />
-            <ellipse cx="150" cy="30" rx="28" ry="22" opacity="0.55" />
-            <ellipse cx="96" cy="196" rx="34" ry="26" opacity="0.6" />
-            <ellipse cx="16" cy="72" rx="30" ry="24" opacity="0.5" />
+            <ellipse cx="150" cy="120" rx="130" ry="96" opacity="0.85" />
+            <ellipse cx="290" cy="250" rx="106" ry="84" opacity="0.72" />
+            <ellipse cx="70" cy="310" rx="118" ry="90" opacity="0.78" />
+            <ellipse cx="320" cy="60" rx="80" ry="64" opacity="0.58" />
+            <ellipse cx="200" cy="400" rx="96" ry="74" opacity="0.62" />
+            <ellipse cx="20" cy="150" rx="86" ry="68" opacity="0.52" />
         </g>
     )
 
@@ -132,9 +134,9 @@ export default function HeroBackdrop(props: HeroBackdropProps) {
                     </filter>
                 </defs>
 
-                <g transform="translate(-40 330)">{cluster}</g>
-                <g transform="translate(1300 250) scale(-1 1)">{cluster}</g>
-                <g transform="translate(1250 430) scale(0.7)">{cluster}</g>
+                <g transform="translate(-160 90)">{cluster}</g>
+                <g transform="translate(1600 -80) scale(-1 1)">{cluster}</g>
+                <g transform="translate(1220 260) scale(0.75)">{cluster}</g>
 
                 {grain > 0 && (
                     <rect
