@@ -269,3 +269,26 @@ Rather than chase an exact pixel number a third time, added
 the hero section's real boundary regardless of exact height, so this
 class of bug (guess a height, overshoot or undershoot, repeat) shouldn't
 recur — a generous backdrop height is now safe to keep.
+
+## Booking-steps card: intentional overlap between hero and next section
+
+The mockup has the "Book Online / Relax / Beauty / Feel Amazing" card
+straddling the boundary — its top portion sits over the hero's pink
+background, its bottom portion over the cream section below. This was
+initially misread as a bug (backdrop bleeding into the card) rather than
+a deliberate design the card itself needed to achieve.
+
+Fixed by making the card (`dQ8b67g7e`, previously an ordinary flow child
+of `VOobmrVR3` with `padding="46px 0px 0px 0px"` providing the gap above
+it) `position="absolute"` with `top="-50px"` and `left="75px"` (centering
+math: (1440 - 1290) / 2), `zIndex="10"`. Because `top` is relative to the
+card's own parent (`VOobmrVR3`, which starts exactly where the hero ends),
+this pulls it up into the hero regardless of the hero's exact height — no
+need to know or guess the hero's pixel height at all, sidestepping the
+whole class of bug from the backdrop-height saga above.
+
+The card no longer contributes to `VOobmrVR3`'s flow height (it is out of
+flow), so the "Our Services" heading below it now gets its spacing purely
+from `VOobmrVR3`'s own 46px top padding plus `cVtVGoeoN`'s 40px — about
+26px of clearance below the card's visible bottom edge at these values.
+Revisit if that reads as too tight or too loose once seen live.
