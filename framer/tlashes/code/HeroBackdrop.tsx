@@ -1,11 +1,26 @@
 // Instructions: the hero's blush environment — the warm gradient ground, the
-// bloom of light behind the eye portrait, soft out-of-focus blossom clusters at
-// both edges and a film grain over the whole band. Sits absolutely behind the
-// hero content; never takes pointer events.
+// bloom of light behind the eye portrait, and soft out-of-focus blossom
+// shapes bleeding in from the corners. Sits absolutely behind the hero
+// content; never takes pointer events.
+//
+// NOTE: the top colour prop is called `skyTop`, not `top`. A prop named `top`
+// is swallowed by the layout pin attribute of the same name when an instance
+// is written from XML over MCP.
+//
+// NOTE: this component deliberately uses ONLY plain CSS (linear-gradient,
+// radial-gradient, border-radius). An earlier version built the blossom
+// shapes as SVG <ellipse> nodes behind an SVG <filter><feGaussianBlur>, with
+// the bloom animated via framer-motion. Both were confirmed present in the
+// deployed code and correctly wired to the instance on the page, yet the
+// rendered result in Framer's own canvas showed no visible effect at all —
+// a flat gradient with no bloom, no blossoms. Whatever the exact cause
+// (SVG filter primitives or framer-motion's animate effects not running in
+// Framer's canvas render pass), it wasn't diagnosable without visual access
+// to the canvas, so the fix was to stop depending on either: radial-gradient
+// already produces a soft falloff on its own, no blur filter needed, and a
+// plain static div needs no animation library to hold an opacity.
 
-import { addPropertyControls, ControlType, useIsStaticRenderer } from "framer"
-import { motion, useReducedMotion } from "framer-motion"
-import { useId } from "react"
+import { addPropertyControls, ControlType } from "framer"
 import type { CSSProperties } from "react"
 
 interface HeroBackdropProps {
@@ -14,8 +29,59 @@ interface HeroBackdropProps {
     base: string
     bloom: string
     blossom: string
-    grain: number
     style?: CSSProperties
+}
+
+interface Blob {
+    left: number
+    top: number
+    w: number
+    h: number
+    opacity: number
+}
+
+// One cluster's petals, as offsets from the cluster's own anchor point.
+// Values are px, tuned against a 1440x620 frame — the same coordinate
+// philosophy as the previous SVG viewBox, just consumed by plain divs.
+const PETALS: Blob[] = [
+    { left: 0, top: 0, w: 320, h: 240, opacity: 0.55 },
+    { left: 210, top: 160, w: 260, h: 200, opacity: 0.42 },
+    { left: -70, top: 220, w: 280, h: 210, opacity: 0.48 },
+    { left: 260, top: -60, w: 190, h: 150, opacity: 0.32 },
+    { left: 90, top: 320, w: 220, h: 170, opacity: 0.36 },
+    { left: -110, top: 60, w: 200, h: 160, opacity: 0.3 },
+]
+
+function Cluster({
+    anchorLeft,
+    anchorTop,
+    color,
+    scale = 1,
+}: {
+    anchorLeft: number
+    anchorTop: number
+    color: string
+    scale?: number
+}) {
+    return (
+        <>
+            {PETALS.map((p, i) => (
+                <div
+                    key={i}
+                    style={{
+                        position: "absolute",
+                        left: anchorLeft + p.left * scale,
+                        top: anchorTop + p.top * scale,
+                        width: p.w * scale,
+                        height: p.h * scale,
+                        opacity: p.opacity,
+                        borderRadius: "50%",
+                        background: `radial-gradient(ellipse at center, ${color} 0%, ${color} 22%, transparent 72%)`,
+                    }}
+                />
+            ))}
+        </>
+    )
 }
 
 /**
@@ -28,30 +94,7 @@ interface HeroBackdropProps {
  * @framerSupportedLayoutHeight any
  */
 export default function HeroBackdrop(props: HeroBackdropProps) {
-    const { skyTop, mid, base, bloom, blossom, grain, style } = props
-
-    const isStatic = useIsStaticRenderer()
-    const reduced = useReducedMotion()
-    const animate = !isStatic && !reduced
-
-    const uid = useId().replace(/:/g, "")
-    const softId = `soft-${uid}`
-    const grainId = `grain-${uid}`
-
-    // One blossom cluster, reused mirrored on both edges. Petals are plain
-    // ellipses pushed far out of focus, which is what sells depth here.
-    // Sized to actually read at page scale — at 1440px wide, anything under
-    // ~80px radius disappears into the blur before it registers as a shape.
-    const cluster = (
-        <g filter={`url(#${softId})`} fill={blossom}>
-            <ellipse cx="150" cy="120" rx="130" ry="96" opacity="0.85" />
-            <ellipse cx="290" cy="250" rx="106" ry="84" opacity="0.72" />
-            <ellipse cx="70" cy="310" rx="118" ry="90" opacity="0.78" />
-            <ellipse cx="320" cy="60" rx="80" ry="64" opacity="0.58" />
-            <ellipse cx="200" cy="400" rx="96" ry="74" opacity="0.62" />
-            <ellipse cx="20" cy="150" rx="86" ry="68" opacity="0.52" />
-        </g>
-    )
+    const { skyTop, mid, base, bloom, blossom, style } = props
 
     return (
         <div
@@ -66,14 +109,13 @@ export default function HeroBackdrop(props: HeroBackdropProps) {
             }}
             aria-hidden="true"
         >
+            {/* Blossom clusters, bleeding in from three corners. */}
+            <Cluster anchorLeft={-180} anchorTop={200} color={blossom} />
+            <Cluster anchorLeft={1180} anchorTop={-140} color={blossom} scale={1.1} />
+            <Cluster anchorLeft={1260} anchorTop={300} color={blossom} scale={0.85} />
+
             {/* Bloom of warm light behind the portrait. */}
-            <motion.div
-                animate={animate ? { opacity: [0.72, 1, 0.72] } : { opacity: 0.88 }}
-                transition={
-                    animate
-                        ? { duration: 9, repeat: Infinity, ease: "easeInOut" }
-                        : undefined
-                }
+            <div
                 style={{
                     position: "absolute",
                     left: "50%",
@@ -97,7 +139,7 @@ export default function HeroBackdrop(props: HeroBackdropProps) {
                     height: 620,
                     borderRadius: "50%",
                     background:
-                        "radial-gradient(circle, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0) 68%)",
+                        "radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 68%)",
                 }}
             />
 
@@ -113,69 +155,26 @@ export default function HeroBackdrop(props: HeroBackdropProps) {
                         "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,252,250,0.72) 100%)",
                 }}
             />
-
-            <svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 1440 620"
-                preserveAspectRatio="xMidYMid slice"
-                style={{ position: "absolute", inset: 0 }}
-            >
-                <defs>
-                    <filter id={softId} x="-60%" y="-60%" width="220%" height="220%">
-                        <feGaussianBlur stdDeviation="26" />
-                    </filter>
-                    <filter id={grainId}>
-                        <feTurbulence
-                            type="fractalNoise"
-                            baseFrequency="0.85"
-                            numOctaves="3"
-                        />
-                    </filter>
-                </defs>
-
-                <g transform="translate(-160 90)">{cluster}</g>
-                <g transform="translate(1600 -80) scale(-1 1)">{cluster}</g>
-                <g transform="translate(1220 260) scale(0.75)">{cluster}</g>
-
-                {grain > 0 && (
-                    <rect
-                        width="100%"
-                        height="100%"
-                        filter={`url(#${grainId})`}
-                        opacity={grain}
-                    />
-                )}
-            </svg>
         </div>
     )
 }
 
 HeroBackdrop.defaultProps = {
-    skyTop: "#F5E7E1",
-    mid: "#F0DCD5",
-    base: "#F8EEE9",
-    bloom: "rgba(255, 231, 213, 0.95)",
-    blossom: "#E9C0BC",
-    grain: 0.035,
+    skyTop: "#F8EBE2",
+    mid: "#EAC8BE",
+    base: "#FBF6F3",
+    bloom: "rgba(255, 214, 178, 0.98)",
+    blossom: "#E9ACAC",
 }
 
 addPropertyControls(HeroBackdrop, {
-    skyTop: { type: ControlType.Color, title: "Top", defaultValue: "#F5E7E1" },
-    mid: { type: ControlType.Color, title: "Middle", defaultValue: "#F0DCD5" },
-    base: { type: ControlType.Color, title: "Base", defaultValue: "#F8EEE9" },
+    skyTop: { type: ControlType.Color, title: "Top", defaultValue: "#F8EBE2" },
+    mid: { type: ControlType.Color, title: "Middle", defaultValue: "#EAC8BE" },
+    base: { type: ControlType.Color, title: "Base", defaultValue: "#FBF6F3" },
     bloom: {
         type: ControlType.Color,
         title: "Bloom",
-        defaultValue: "rgba(255, 231, 213, 0.95)",
+        defaultValue: "rgba(255, 214, 178, 0.98)",
     },
-    blossom: { type: ControlType.Color, title: "Blossom", defaultValue: "#E9C0BC" },
-    grain: {
-        type: ControlType.Number,
-        title: "Grain",
-        defaultValue: 0.035,
-        min: 0,
-        max: 0.09,
-        step: 0.005,
-    },
+    blossom: { type: ControlType.Color, title: "Blossom", defaultValue: "#E9ACAC" },
 })
