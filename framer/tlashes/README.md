@@ -254,3 +254,18 @@ on purpose, since it is absolutely positioned behind everything and an
 overshoot into the next section blends fine given the base colour is
 already near-white). Whenever content that sits ON TOP of this backdrop
 changes height significantly, re-check whether 950px is still enough.
+
+**Second follow-up: 950px overshot the other way.** The hero section's
+actual flow height (nav row ~157px + hero content row ~729px) is roughly
+886px, so a 950px backdrop bled about 64px past the bottom of the hero
+into the next section (the cream booking-steps card, `dQ8b67g7e`). That
+card's background is `rgba(255,255,255,0.9)` — 90% opaque, not fully
+solid — so the bleed-through pink visibly tinted its top edge and shifted
+where it looked positioned relative to the mockup.
+
+Rather than chase an exact pixel number a third time, added
+`overflow="hidden"` to the hero's own wrapper (`p8ctROg76`, which is
+`height="fit-content"`). Any future backdrop overshoot is now clipped at
+the hero section's real boundary regardless of exact height, so this
+class of bug (guess a height, overshoot or undershoot, repeat) shouldn't
+recur — a generous backdrop height is now safe to keep.
