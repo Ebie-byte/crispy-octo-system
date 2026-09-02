@@ -203,3 +203,43 @@ component nodes at all. This is apparently a native Framer node type
 project didn't cover; the XML tag is just the layer's own name, same
 convention as `<TLashes backgroundImage="...">` elsewhere being a plain
 `Frame`. Nothing to fix or version here — it was already working.
+
+## THE actual hero backdrop bug: negative `zIndex` doesn't paint in Framer's canvas
+
+Everything in the section above ("flat bands", then a full SVG-filter
+version, then a plain-CSS version) was chasing the wrong culprit. Both the
+SVG-filter version and the plain-CSS version were independently
+re-verified — via a fresh `readCodeFile` AND a fresh `getNodeXml` on the
+instance, not just trusting an `updateXmlForNode` diff — to be correctly
+deployed and correctly wired. Neither showed *anything* in a real
+screenshot of the Framer canvas: not flat, not subtle, nothing at all.
+
+The actual cause: the wrapping node had `zIndex="-5"` (deeply negative, so
+it would paint behind sibling content per normal CSS stacking rules).
+**Framer's own canvas apparently does not paint a layer with a deeply
+negative `zIndex` at all**, independent of what that layer contains. This
+was proven with a diagnostic: stripping the component down to one
+hardcoded `backgroundColor: "#FF0000"` div, no props, no gradients,
+nothing else — and it was invisible too, even after the user did a hard
+refresh. Once the wrapper was changed to (a) be the *first* child of its
+parent, so normal document order puts it behind later siblings, and (b)
+`zIndex="0"` instead of `"-5"`, the same solid red instantly rendered
+correctly, filling the whole 1440x620 band.
+
+**The fix for "layer behind other content": never use a negative `zIndex`
+on Framer's canvas. Use document order instead** — put the background/
+behind layer as the *first* child in its parent, give it `zIndex="0"` (or
+omit it), and let later siblings paint over it naturally. This is a
+different technique from the earlier `-300px` instance-offset bug (fixed
+by wrapping in a `Stack` instead of a `Frame`) — that one was a real
+rendering shift; this one is Framer's canvas apparently just not painting
+negative-z-index content, which a plain `Frame` vs `Stack` wrapper had no
+effect on either way.
+
+**Lesson for next time something is "confirmed deployed" but invisible:**
+don't keep iterating on the content (colours, geometry, technique) once
+two independent full-rewrites both produce zero visible change. That's
+the signal to strip to the most minimal possible diagnostic (one hardcoded
+solid colour, no props) and test structural properties of the wrapper
+(z-index, stacking order, sizing) instead — the content was never the
+problem.

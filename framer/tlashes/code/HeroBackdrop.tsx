@@ -7,18 +7,18 @@
 // is swallowed by the layout pin attribute of the same name when an instance
 // is written from XML over MCP.
 //
-// NOTE: this component deliberately uses ONLY plain CSS (linear-gradient,
-// radial-gradient, border-radius). An earlier version built the blossom
-// shapes as SVG <ellipse> nodes behind an SVG <filter><feGaussianBlur>, with
-// the bloom animated via framer-motion. Both were confirmed present in the
-// deployed code and correctly wired to the instance on the page, yet the
-// rendered result in Framer's own canvas showed no visible effect at all —
-// a flat gradient with no bloom, no blossoms. Whatever the exact cause
-// (SVG filter primitives or framer-motion's animate effects not running in
-// Framer's canvas render pass), it wasn't diagnosable without visual access
-// to the canvas, so the fix was to stop depending on either: radial-gradient
-// already produces a soft falloff on its own, no blur filter needed, and a
-// plain static div needs no animation library to hold an opacity.
+// NOTE: this component uses ONLY plain CSS (linear-gradient, radial-gradient,
+// border-radius) — no SVG <filter>, no framer-motion. An earlier version used
+// both and was confirmed deployed correctly, yet rendered nothing visible.
+//
+// NOTE: the REAL bug, found via a solid-red diagnostic build, was not the
+// component at all — it was that the wrapping node on the page had
+// `zIndex="-5"`. Framer's own canvas apparently does not paint a deeply
+// negative z-index layer, even though the code and instance were both
+// correct. The fix on the PAGE (not this file): make this the FIRST child
+// of its parent (so normal document order puts it behind later siblings)
+// and set its zIndex to "0", not a negative number. Do not reintroduce a
+// negative zIndex on the wrapper.
 
 import { addPropertyControls, ControlType } from "framer"
 import type { CSSProperties } from "react"
@@ -41,8 +41,7 @@ interface Blob {
 }
 
 // One cluster's petals, as offsets from the cluster's own anchor point.
-// Values are px, tuned against a 1440x620 frame — the same coordinate
-// philosophy as the previous SVG viewBox, just consumed by plain divs.
+// Values are px, tuned against a 1440x620 frame.
 const PETALS: Blob[] = [
     { left: 0, top: 0, w: 320, h: 240, opacity: 0.55 },
     { left: 210, top: 160, w: 260, h: 200, opacity: 0.42 },
