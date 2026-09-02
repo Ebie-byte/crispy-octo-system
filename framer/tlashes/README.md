@@ -307,3 +307,12 @@ Fixed by switching to `width="fit-content"`, `stackDistribution="start"`,
 and an explicit `gap="34px"` — the row now sizes to its own content and
 spaces every item identically, rather than being stretched to fill an
 arbitrary fixed width.
+
+## About-section stats row: missing dividers between items
+
+Matching the booking-steps card's hairline dividers (1px Frames between
+each of its four items), added the same treatment here: three 1px x 38px
+`Frame`s (`rgba(192,138,99,0.22)`) interspersed between the four stat
+groups, with the row's `stackAlignment` changed to `center` so the
+dividers line up with the visual centre of each icon+text group rather
+than the top.
