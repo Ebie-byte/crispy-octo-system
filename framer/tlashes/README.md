@@ -292,3 +292,18 @@ flow), so the "Our Services" heading below it now gets its spacing purely
 from `VOobmrVR3`'s own 46px top padding plus `cVtVGoeoN`'s 40px — about
 26px of clearance below the card's visible bottom edge at these values.
 Revisit if that reads as too tight or too loose once seen live.
+
+## About-section stats row: edge-justified stretch instead of natural grouping
+
+The 2+/100+/Premium/Certified stat row used `stackDistribution="space-
+between"` inside a fixed `width="500px"` container — that force-stretches
+the first item flush to the left edge, the last flush to the right, with
+the middle two evenly spaced to fill the remaining gap. That produces
+uneven-looking spacing between items as their content widths differ
+("Years Experience" vs "& Fully Trained"), rather than the mockup's
+natural, evenly-gapped grouping.
+
+Fixed by switching to `width="fit-content"`, `stackDistribution="start"`,
+and an explicit `gap="34px"` — the row now sizes to its own content and
+spaces every item identically, rather than being stretched to fill an
+arbitrary fixed width.
