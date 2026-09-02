@@ -316,3 +316,14 @@ each of its four items), added the same treatment here: three 1px x 38px
 groups, with the row's `stackAlignment` changed to `center` so the
 dividers line up with the visual centre of each icon+text group rather
 than the top.
+
+## Stats row overflow after removing the fixed width
+
+Switching the row to `width="fit-content"` (to fix the space-between
+edge-stretch) let it grow to its natural content width, which is wider
+than the 560px column it sits in - the last item ("Certified & Fully
+Trained") rendered outside the visible frame. Fixed by constraining the
+row back to `width="100%"` of its column, tightening the gap (26px ->
+18px) to give the content more room to actually fit, and adding
+`stackWrap="true"` as a safety net so if it still doesn't fit on one
+line, it wraps to a second line instead of rendering outside the frame.
