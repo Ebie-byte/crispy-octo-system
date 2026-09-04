@@ -181,14 +181,54 @@ Make sure the Team query selects the new columns (`select("*")` already does).
 
 ## Before the first invite will actually send
 
-1. **DNS** — add the three records for `send.vertexiawebstudios.co.za` (in the
-   session summary), then verify the domain in Resend.
-2. **Edge function secret** — set `INVITE_FROM` to an address on that verified
-   domain, e.g. `Vertexia Web Studios <team@send.vertexiawebstudios.co.za>`.
-   Without it the function falls back to `onboarding@resend.dev`, which Resend
-   only delivers to the account owner — invites to the team's Gmail addresses
-   would silently not arrive.
-3. **Redirect allow-list** — in Supabase → Authentication → URL Configuration,
-   add `https://vertexia-dashboard.vercel.app/accept-invite`.
-4. **Leaked-password protection** — Authentication → Policies. Worth enabling
-   before four new passwords get set.
+Confirmed sender: **`team@send.vertexiawebstudios.co.za`**. That address is now
+the built-in default in the edge function, so there is **no `INVITE_FROM` secret
+to set** — it only needs setting if you later want a different address.
+
+### 1. DNS — three records at domains.co.za
+
+Manage the zone for **`vertexiawebstudios.co.za`** (not the subdomain — the
+subdomain does not exist as its own zone). Enter the names **exactly as shown,
+without the domain suffix**; domains.co.za appends it for you. Typing the full
+name is the usual failure here and yields
+`resend._domainkey.send.vertexiawebstudios.co.za.vertexiawebstudios.co.za`.
+
+| # | Type | Host / Name | Value | Priority |
+| --- | --- | --- | --- | --- |
+| 1 | TXT | `resend._domainkey.send` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8uK10smc1cPwoI59KzczAFLUIug7pGP6lVWQZfl5bsY7XRPN8/N4wDtH3yPYjT2HDTnurwNs5hy5GnS/ER0D/Z+gf0iNSgMSmfgai4fh6aylum4Jf4Ho3+r+XVvc+2Feijz4UCjLAk8xTdkZWz6TakKoXzpMKPMGZ+rZ2yLYG7wIDAQAB` | — |
+| 2 | MX | `send.send` | `feedback-smtp.eu-west-1.amazonses.com` | `10` |
+| 3 | TXT | `send.send` | `v=spf1 include:amazonses.com ~all` | — |
+
+`send.send` is not a typo. The Resend domain is `send.vertexiawebstudios.co.za`
+and its return-path lives at `send.` of that, so relative to the root zone the
+host really is `send.send`.
+
+Notes:
+
+- The DKIM value starts at `p=` with no `v=DKIM1; k=rsa;` prefix. Paste it
+  verbatim; do not add the prefix and do not wrap it in quotes.
+- Record 3 sits on the **subdomain**, so it cannot collide with any SPF record
+  on `vertexiawebstudios.co.za` itself. Existing mail on the root domain is
+  unaffected — that is why the subdomain was chosen.
+- Propagation is usually minutes, occasionally a few hours.
+
+### 2. Verify in Resend
+
+Resend → Domains → `send.vertexiawebstudios.co.za` → **Verify DNS Records**.
+Ask Claude to run the verification instead if that is easier — the domain ID is
+`dc23c376-8b3f-46bd-b914-3674d120dddb`.
+
+### 3. Supabase redirect allow-list
+
+Authentication → URL Configuration → Redirect URLs, add:
+
+```
+https://vertexia-dashboard.vercel.app/accept-invite
+```
+
+Without this the invite link bounces rather than landing on the set-password
+page.
+
+### 4. Leaked-password protection
+
+Authentication → Policies. Worth switching on before four new passwords exist.
