@@ -19,6 +19,27 @@ supabase functions download invite-team-member     # the invite function
 | `20260904081544` | `founder_only_settings_pricing_and_titles` | The lockdown. Founder-only writes on `settings`, `packages`, `international_pricing`, `services`. On `team_members`: read for all staff, update only your own row, insert/delete founder-only — plus a `BEFORE UPDATE` trigger that reverts founder-controlled columns. |
 | `20260904084333` | `team_member_invite_status` | Adds `invited_at` / `activated_at`; stamps activation on first sign-in; extends the column guard to cover both. |
 | `20260904085105` | `normalise_team_member_emails` | Lower-cases stored addresses and adds a unique index on `lower(email)`. |
+| `20260904112949` | `close_anon_writes_on_org_structure` | Founder-only writes on `org_roles`, `org_role_departments`, `org_role_collaborators`; `invoice_templates` writes now require sign-in. Reads unchanged. |
+
+## The second place job titles live
+
+`team_members.role` was locked in the migration above. `org_roles.title` is the
+same fact stored a second time — it is what the Org Structure tab edits — and it
+was missed on the first pass.
+
+Worse than missed: `org_roles`, `org_role_departments`, `org_role_collaborators`
+and `invoice_templates` carried policies granted to the Postgres `public` role,
+which **includes `anon`**. Verified against the live database before fixing: a
+signed-out caller holding the publishable key from the JS bundle rewrote all
+three head-of-department job titles and deleted every row of
+`org_role_departments`.
+
+Writes on the three org tables are now founder-only; `invoice_templates`
+requires sign-in. **Reads were deliberately left as they were**, `anon` included
+— the damage vector is the write, and narrowing the read would risk breaking a
+public page this work could not see. If nothing outside the dashboard reads the
+org chart, tightening those three SELECT policies to `authenticated` is a
+one-line change and worth doing.
 
 ## Why a trigger and not just RLS
 

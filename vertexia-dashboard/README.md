@@ -14,6 +14,7 @@ are new and drop straight in.
 | --- | --- |
 | Founder identity + auth linkage | **Applied** to Supabase |
 | Founder-only RLS on settings, pricing, job titles | **Applied**, and tested both directions |
+| Anon write access closed on org chart + invoice templates | **Applied** — was open to the whole internet |
 | `invite-team-member` edge function | **Deployed** |
 | Resend sending domain | **Created**, pending your DNS |
 | Frontend changes | **In this folder**, to apply by hand |
@@ -35,6 +36,7 @@ while the publishable key sits in the public bundle:
 
 - change their own job title, department, email or phone
 - change anyone else's
+- edit the org chart (`org_roles`) — the other place titles are stored
 - read or write business settings, or any pricing
 - add or delete team members
 - make themselves the founder
