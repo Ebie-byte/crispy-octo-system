@@ -16,7 +16,8 @@ are new and drop straight in.
 | Founder-only RLS on settings, pricing, job titles | **Applied**, and tested both directions |
 | Anon write access closed on org chart + invoice templates | **Applied** — was open to the whole internet |
 | `invite-team-member` edge function | **Deployed** |
-| Resend sending domain | **Created**, pending your DNS |
+| Resend sending domain | **DNS added, verification in progress** |
+| Auth password floor | **Raised to 8 characters** — matches what `/accept-invite` already enforced client-side, now also enforced server-side |
 | Frontend changes | **In this folder**, to apply by hand |
 
 ## The flow
