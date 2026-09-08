@@ -28,8 +28,11 @@ import { useSyncExternalStore } from "react"
 // Full international format, digits only: country code + number.
 // No "+", no spaces, no dashes, and drop the leading 0 of the local part.
 // Tristan's number is 072 148 2950 -> 27 + 721482950 -> "27721482950".
+//
+// Typed as string rather than left to literal inference, so the placeholder
+// check below stays a real runtime check instead of a compile-time tautology.
 // ─────────────────────────────────────────────────────────────────────────────
-export const WHATSAPP_NUMBER = "27721482950"
+export const WHATSAPP_NUMBER: string = "27721482950"
 
 /** True while the shipped placeholder is still in place. */
 export const WHATSAPP_NUMBER_IS_PLACEHOLDER = WHATSAPP_NUMBER === "27000000000"

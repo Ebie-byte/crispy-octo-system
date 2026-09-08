@@ -90,6 +90,9 @@ export default function ConsultationSheet(props: ConsultationSheetProps) {
 
     const panelRef = useRef<HTMLDivElement | null>(null)
     const firstFieldRef = useRef<HTMLInputElement | null>(null)
+    // Set once a booking has actually been handed off, so the next opening
+    // starts blank instead of resurrecting the previous person's details.
+    const handedOffRef = useRef(false)
 
     const rawId = useId()
     const cls = `cs${rawId.replace(/[^a-zA-Z0-9]/g, "")}`
@@ -109,10 +112,21 @@ export default function ConsultationSheet(props: ConsultationSheetProps) {
     // selection through" behaviour.
     useEffect(() => {
         if (!open) return
+        // Read the flag now: the setFields updater below runs during a later
+        // render, by which point resetting the ref would already have hidden it.
+        const wasHandedOff = handedOffRef.current
+        handedOffRef.current = false
         startTransition(() => {
             setStatus("form")
             setShowErrors(false)
-            setFields((prev) => ({ ...prev, branch: getSelectedBranch() }))
+            // Closing without submitting keeps what was typed — an accidental
+            // dismissal should not cost the visitor their entries. A completed
+            // booking clears, so the next one starts clean.
+            setFields((prev) =>
+                wasHandedOff
+                    ? { ...EMPTY, branch: getSelectedBranch() }
+                    : { ...prev, branch: getSelectedBranch() }
+            )
         })
     }, [open])
 
@@ -203,6 +217,7 @@ export default function ConsultationSheet(props: ConsultationSheetProps) {
         // Called synchronously inside the submit handler so the pop-up blocker
         // treats it as user-initiated.
         const opened = openTab(message)
+        handedOffRef.current = true
         startTransition(() => setStatus(opened ? "opened" : "blocked"))
     }
 
