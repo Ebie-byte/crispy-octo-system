@@ -9,6 +9,7 @@ and restored.
 | File | Framer path | Used for |
 | --- | --- | --- |
 | `code/tristanConfig.tsx` | `tristanConfig.tsx` | Shared module: the WhatsApp number, branch list, message builder, cross-component stores, design tokens. Every other file imports it. Also default-exports a `ConfigStatus` badge. |
+| `code/FluidHeadline.tsx` | `FluidHeadline.tsx` | The hero headline. Sized with CSS `clamp()` so it scales continuously with the viewport — see the responsive notes below. |
 | `code/TristanIcon.tsx` | `TristanIcon.tsx` | Every icon: qualification shield / dumbbell / flame, and the WhatsApp mark. |
 | `code/ImageSlot.tsx` | `ImageSlot.tsx` | Placeholder-aware image slot — hero photo (with left gradient fade), Planet Fitness logo, QR code. |
 | `code/ActionButton.tsx` | `ActionButton.tsx` | Every button. Opens the booking sheet, opens WhatsApp directly, or follows a URL. |
@@ -109,14 +110,67 @@ adding a child reorders it to the end).
   Prefix each such import with a single-line `// @ts-ignore`; a two-line
   comment or a multi-line import statement breaks the suppression.
 
+## Responsive: one fluid layout, not three
+
+Tablet (810px) and Phone (390px) breakpoints exist. Two hard limits shaped how
+they are supported:
+
+1. **Breakpoints are replica nodes, and their children are not addressable.**
+   `getNodeXml` on the Phone breakpoint returns the root and nothing else.
+   Writing to a child nodeId while nesting it under the Phone root reports
+   success but the change lands on **Desktop** — verified by writing a
+   distinctive value and reading it back from the Desktop tree. So there are no
+   per-breakpoint layer overrides over MCP. Only attributes on the breakpoint
+   *root itself* (its padding, for example) are per-breakpoint.
+2. **Text-style `fontSize` is px-only.** `clamp(...)` and `vw` values are
+   accepted by `manageTextStyle`, reported as success, and silently discarded —
+   the echoed style still shows the old px value. Confirmed live by writing a
+   plain px value, which does take.
+
+Together those mean the page cannot have three tuned layouts; it has to be one
+layout that holds at every width. How that was done:
+
+- **Hero** is a vertical stack: top bar, then a wrapping two-column row. The
+  columns are `1fr` with `minWidth: 300px`, so they sit side by side above
+  ~630px and stack below it. It was previously absolutely positioned with fixed
+  `left` pins, which could not reflow at all.
+- **Every two-column section** (About, Locations, Services, Get Started) has
+  `stackWrap="true"` with `1fr` / `minWidth: 280px` columns, so each collapses
+  to a single column on phone.
+- **Fixed widths became fluid**: the quote and CTA stack are `width: 100%` with
+  a `maxWidth`, rather than 440px / 520px.
+- **Section padding** dropped from 44px to 32px, and the breakpoint roots carry
+  their own padding (Desktop 28, Tablet 20, Phone 12) — one of the few genuine
+  per-breakpoint overrides available.
+- **Qualification labels** use new centred caps styles and full-width boxes, so
+  "SUSTAINABLE FAT LOSS" wraps to two centred lines in a narrow column instead
+  of overflowing.
+- **The hero headline** is `FluidHeadline.tsx`, sized `clamp(44px, 8.2vw,
+  92px)`. This is the one piece of type that genuinely breaks rather than merely
+  looking large — 92px in a 390px viewport. Everything else was reduced to sizes
+  that read acceptably at all three widths (section headings 34px, stats 40px,
+  prices 26px).
+
+### If you want per-breakpoint type sizes
+
+Framer supports different font sizes per breakpoint in the text-style editor;
+the MCP just cannot reach them. To tune by hand, edit these styles at the Phone
+breakpoint: `/Display/Section`, `/Display/Stat`, `/Row/Price`,
+`/Display/Quote`. The headline needs no attention — it is already fluid.
+
+## Testing the WhatsApp flow
+
+Buttons do nothing on the Framer **canvas** — the canvas is a static renderer
+and never runs click handlers. Use **Preview**, or publish and open the staging
+URL in a real tab (more reliable, since some browsers block scripted
+`window.open` inside the preview iframe).
+
+The standalone WhatsApp buttons are plain `<a href>` links built from the shared
+number, so they cannot be blocked by a pop-up blocker. Only the booking sheet
+uses JS, because its link is assembled from the live form values on submit.
+
 ## Outstanding — not done, and why
 
-- **Breakpoints.** The page is desktop-only (1200px). Framer breakpoints are a
-  special node type the MCP cannot create — writing a sibling frame produces a
-  plain frame, not a breakpoint. They have to be added in the editor, after
-  which the tablet and phone layouts can be styled over MCP. The hero was
-  rebuilt as a two-column flow layout (copy `1fr`, photo `520px`) rather than
-  absolute pins specifically so it reflows sensibly once they exist.
 - **Three image slots are empty**: hero photo, Planet Fitness logo, QR code.
   Each renders a labelled placeholder. To fill one: drag the asset onto the
   canvas to upload it, copy its `framerusercontent.com` URL, paste it into the

@@ -20,6 +20,14 @@
 //     shared store that ConsultationSheet listens to. No canvas wiring needed,
 //     so the two triggers stay in sync automatically.
 //
+//  - "i cant interact or click the buttons i need to see if it goes to his
+//     whatsapp and all the info" — the WhatsApp action is now a real <a href>
+//     built at render time rather than a scripted window.open. A plain link
+//     cannot be eaten by a pop-up blocker, works inside the Framer preview
+//     iframe, and supports long-press / right-click / "open in new tab". Only
+//     the booking sheet still needs JS, because its link is assembled from
+//     live form values at submit time.
+//
 // Hover and focus are done with a real stylesheet keyed to a useId class
 // rather than React state: no re-render per pointer move, and it keeps the
 // component free of the state updates Framer asks to be wrapped in
@@ -29,7 +37,7 @@ import { addPropertyControls, ControlType } from "framer"
 import { useId } from "react"
 import type { CSSProperties } from "react"
 // @ts-ignore — Framer resolves code-file module URLs at runtime; the typechecker has no declarations for them.
-import { GENERIC_GREETING, openConsultationSheet, openWhatsApp, tokens } from "https://framer.com/m/tristanConfig-9QrhiB.js"
+import { GENERIC_GREETING, buildWhatsAppLink, openConsultationSheet, tokens } from "https://framer.com/m/tristanConfig-9QrhiB.js"
 // @ts-ignore — as above.
 import TristanIcon from "https://framer.com/m/TristanIcon-FhSJ0F.js"
 
@@ -68,7 +76,7 @@ export default function ActionButton(props: ActionButtonProps) {
         width: "100%",
         height: "100%",
         minHeight,
-        padding: "0 20px",
+        padding: "0 16px",
         margin: 0,
         border: filled ? "1px solid transparent" : `1px solid ${tokens.line}`,
         borderRadius: 0,
@@ -79,6 +87,7 @@ export default function ActionButton(props: ActionButtonProps) {
         fontWeight: filled ? 600 : 500,
         letterSpacing: "2.5px",
         textTransform: "uppercase",
+        textAlign: "center",
         textDecoration: "none",
         cursor: "pointer",
         transition:
@@ -110,29 +119,20 @@ export default function ActionButton(props: ActionButtonProps) {
         </>
     )
 
-    function handleClick(event: { preventDefault: () => void }) {
-        if (action === "book") {
-            event.preventDefault()
-            openConsultationSheet()
-            return
-        }
-        if (action === "whatsapp") {
-            event.preventDefault()
-            // Called synchronously from the click so the pop-up blocker lets
-            // the tab through.
-            openWhatsApp(GENERIC_GREETING)
-        }
-    }
+    // Both link-shaped actions render an anchor. "whatsapp" builds its own
+    // href from the shared number so there is still only one place to edit it.
+    if (action === "link" || action === "whatsapp") {
+        const target =
+            action === "whatsapp"
+                ? buildWhatsAppLink(GENERIC_GREETING)
+                : href || undefined
 
-    // A plain external link stays an anchor so middle-click and "open in new
-    // tab" behave normally. The two scripted actions are real buttons.
-    if (action === "link") {
         return (
             <>
                 <style>{hoverCss + focusCss}</style>
                 <a
                     className={cls}
-                    href={href || undefined}
+                    href={target}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={base}
@@ -149,7 +149,7 @@ export default function ActionButton(props: ActionButtonProps) {
             <button
                 className={cls}
                 type="button"
-                onClick={handleClick}
+                onClick={() => openConsultationSheet()}
                 style={base}
             >
                 {inner}
