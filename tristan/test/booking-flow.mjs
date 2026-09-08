@@ -31,6 +31,17 @@ check("sheet hidden before click", !(await panel.isVisible()));
 await page.locator("#book button").click();
 await page.waitForTimeout(500);
 check("Book opens the sheet", await panel.isVisible());
+{
+  const m = await page.evaluate(() => {
+    const el = document.querySelector('[role="dialog"]');
+    const w = el.parentElement;
+    return { h: el.clientHeight, scroll: el.scrollHeight, wrapH: w.clientHeight,
+             wrapPos: getComputedStyle(w).position };
+  });
+  check("overlay is pinned to the viewport", m.wrapPos === "fixed", JSON.stringify(m));
+  check("panel is not collapsed", m.h > 400, JSON.stringify(m));
+  check("panel shows the form without scrolling", m.h >= m.scroll - 2, JSON.stringify(m));
+}
 
 // 4. Capture what submit hands to WhatsApp
 await page.evaluate(() => { window.__opened = null;

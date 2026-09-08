@@ -10,6 +10,7 @@ and restored.
 | --- | --- | --- |
 | `code/tristanConfig.tsx` | `tristanConfig.tsx` | Shared module: the WhatsApp number, branch list, message builder, cross-component stores, design tokens. Every other file imports it. Also default-exports a `ConfigStatus` badge. |
 | `code/FluidHeadline.tsx` | `FluidHeadline.tsx` | The hero headline. Sized with CSS `clamp()` so it scales continuously with the viewport — see the responsive notes below. |
+| `code/DemoBanner.tsx` | `DemoBanner.tsx` | Fixed "DEMO — not approved" notice for the HR review round. One toggle (`Show banner`) turns it off for launch. |
 | `code/TristanIcon.tsx` | `TristanIcon.tsx` | Every icon: qualification shield / dumbbell / flame, and the WhatsApp mark. |
 | `code/ImageSlot.tsx` | `ImageSlot.tsx` | Placeholder-aware image slot — hero photo (with left gradient fade), Planet Fitness logo, QR code. |
 | `code/ActionButton.tsx` | `ActionButton.tsx` | Every button. Opens the booking sheet, opens WhatsApp directly, or follows a URL. |
@@ -168,6 +169,18 @@ URL in a real tab (more reliable, since some browsers block scripted
 The standalone WhatsApp buttons are plain `<a href>` links built from the shared
 number, so they cannot be blocked by a pop-up blocker. Only the booking sheet
 uses JS, because its link is assembled from the live form values on submit.
+
+## Sending it for approval
+
+The page carries placeholder photos **and invented figures** — the years, client
+count, REPS certification line and all three prices were written to match the
+original mockup, not supplied by Tristan. `DemoBanner` puts a fixed notice at the
+top saying so, because an approval link tends to get forwarded and those numbers
+would otherwise read as claims Tristan is making. Switch `Show banner` off before
+launch; it needs no code change and leaves nothing behind.
+
+Get every figure and the certification line confirmed before HR sees it. A wrong
+certification claim is a much bigger problem than an empty photo slot.
 
 ## Outstanding — not done, and why
 

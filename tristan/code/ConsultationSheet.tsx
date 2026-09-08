@@ -26,16 +26,24 @@
 //  - "Native pickers are fine for v1." Date, time and branch are real native
 //     inputs; colorScheme: dark keeps their controls legible on the dark panel.
 //
-// PLACEMENT: this component must sit inside a canvas Frame with
-// position="fixed" covering the viewport. Framer's own guidance is that a code
-// component must never use position: fixed itself — it breaks canvas layout and
-// thumbnails — so the fixed layer is the parent and this fills it. When closed
-// the root sets pointer-events: none, so the page underneath stays fully
-// clickable through the invisible overlay.
+// POSITIONING — deliberate deviation from Framer's component guidance.
 //
-// The scrim and centring wrapper are pinned to 100vw rather than 100% because
-// that fixed parent is only as wide as the 1200px page column; at 100% the dim
-// would stop at the column edge and leave bright margins on a wide monitor.
+// Framer asks that code components never use position: fixed, and the first
+// version obeyed that: the root filled a canvas Frame that was itself fixed at
+// 100% x 100%. That made the sheet's size depend on whatever the parent frame
+// resolved to — and it resolved to nothing. Measured in Chromium, the wrapper
+// came out height: 0 and the panel collapsed to 70px with 776px of form
+// scrolling inside it. That is almost certainly the "the sheet does not work"
+// symptom.
+//
+// So the overlay now pins itself. The root renders inert at 0 x 0 and takes no
+// layout space; the scrim and the centring wrapper are position: fixed against
+// the viewport. The component is correct regardless of its parent's size, which
+// is the property that matters for a modal.
+//
+// This file is covered by tristan/test/booking-flow.mjs, which drives the real
+// component in Chromium: open, fill, submit, assert the wa.me URL carries every
+// field, and assert the panel is actually tall enough to use.
 
 import { addPropertyControls, ControlType } from "framer"
 import { startTransition, useCallback, useEffect, useId, useRef, useState } from "react"
@@ -54,6 +62,9 @@ interface Fields {
     time: string
     notes: string
 }
+
+// Above Framer's own chrome, below nothing.
+const LAYER = 2147483000
 
 const EMPTY: Fields = {
     name: "",
@@ -229,12 +240,12 @@ export default function ConsultationSheet(props: ConsultationSheetProps) {
     )
 
     const css = `
-.${cls}-root{position:relative;width:100%;height:100%;font-family:${tokens.sans}}
-.${cls}-scrim{position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;background:rgba(4,5,7,0.72);opacity:0;transition:opacity 260ms ease}
-.${cls}-wrap{position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;display:flex;justify-content:center;align-items:flex-end;padding:0}
-.${cls}-panel{position:relative;box-sizing:border-box;width:100%;max-width:720px;max-height:88%;overflow-y:auto;background:${tokens.panel};border:1px solid ${tokens.line};border-bottom:none;padding:34px;opacity:0;transform:translateY(28px);transition:transform 360ms cubic-bezier(0.16,1,0.3,1),opacity 240ms ease}
-.${cls}-open .${cls}-scrim{opacity:1}
-.${cls}-open .${cls}-panel{opacity:1;transform:none}
+.${cls}-scrim{position:fixed;inset:0;z-index:${LAYER};background:rgba(4,5,7,0.72);opacity:0;visibility:hidden;transition:opacity 260ms ease,visibility 0s linear 300ms}
+.${cls}-wrap{position:fixed;inset:0;z-index:${LAYER + 1};display:flex;justify-content:center;align-items:flex-end;padding:0;pointer-events:none;visibility:hidden;transition:visibility 0s linear 300ms}
+.${cls}-panel{position:relative;box-sizing:border-box;width:100%;max-width:720px;max-height:88vh;overflow-y:auto;pointer-events:auto;background:${tokens.panel};border:1px solid ${tokens.line};border-bottom:none;padding:34px;font-family:${tokens.sans};opacity:0;transform:translateY(28px);transition:transform 360ms cubic-bezier(0.16,1,0.3,1),opacity 240ms ease}
+.${cls}-on .${cls}-scrim{opacity:1;visibility:visible;transition:opacity 260ms ease}
+.${cls}-on .${cls}-wrap{visibility:visible;transition:visibility 0s}
+.${cls}-on .${cls}-panel{opacity:1;transform:none}
 .${cls}-field{width:100%;box-sizing:border-box;background:transparent;border:1px solid ${tokens.line};border-radius:0;padding:13px 14px;color:${tokens.text};font-family:${tokens.sans};font-size:14px;font-weight:300;color-scheme:dark;transition:border-color 180ms ease}
 .${cls}-field:focus{outline:none;border-color:${tokens.accent}}
 .${cls}-field::placeholder{color:${tokens.faint}}
@@ -242,28 +253,32 @@ export default function ConsultationSheet(props: ConsultationSheetProps) {
 .${cls}-row{display:flex;gap:14px}
 .${cls}-row>*{flex:1;min-width:0}
 @media (min-width:900px){.${cls}-wrap{align-items:center;padding:32px}.${cls}-panel{border-bottom:1px solid ${tokens.line}}}
-@media (max-width:640px){.${cls}-panel{padding:24px}.${cls}-row{flex-direction:column;gap:18px}}
+@media (max-width:640px){.${cls}-panel{padding:22px;max-height:92vh}.${cls}-row{flex-direction:column;gap:18px}}
 @media (prefers-reduced-motion:reduce){.${cls}-panel{transition:opacity 160ms ease;transform:none}}
 `
 
     return (
         <div
-            className={`${cls}-root${open ? ` ${cls}-open` : ""}`}
+            className={open ? `${cls}-on` : undefined}
             style={{
-                pointerEvents: open ? "auto" : "none",
-                visibility: open ? "visible" : "hidden",
-                transition: open
-                    ? "visibility 0s"
-                    : "visibility 0s linear 300ms",
+                // Inert: takes no layout space, so the frame this sits in can
+                // be any size without affecting the overlay.
+                position: "relative",
+                width: 0,
+                height: 0,
+                overflow: "visible",
                 ...style,
             }}
-            aria-hidden={!open}
         >
             <style>{css}</style>
 
-            <div className={`${cls}-scrim`} onClick={close} />
+            <div
+                className={`${cls}-scrim`}
+                onClick={close}
+                style={{ pointerEvents: open ? "auto" : "none" }}
+            />
 
-            <div className={`${cls}-wrap`}>
+            <div className={`${cls}-wrap`} aria-hidden={!open}>
                 <div
                     ref={panelRef}
                     className={`${cls}-panel`}
@@ -328,7 +343,7 @@ function FormBody(p: {
                     margin: "18px 0 0",
                     fontFamily: tokens.serif,
                     fontWeight: 300,
-                    fontSize: 38,
+                    fontSize: "clamp(28px, 6vw, 38px)",
                     lineHeight: 1.15,
                     letterSpacing: "-0.005em",
                     color: tokens.text,
@@ -504,7 +519,7 @@ function HandoffBody(p: {
                     margin: "18px 0 0",
                     fontFamily: tokens.serif,
                     fontWeight: 300,
-                    fontSize: 38,
+                    fontSize: "clamp(28px, 6vw, 38px)",
                     lineHeight: 1.15,
                     color: tokens.text,
                 }}
