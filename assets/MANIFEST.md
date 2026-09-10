@@ -307,6 +307,34 @@ and the dead space carries brand typography, so it reads as a designed portfolio
 card. The shift from full-bleed to card is also dramatically motivated: the film
 moves from being IN the world to LOOKING AT the work.
 
+## CARDS BUILT — VERTEXIA_act_v3.mp4
+Scenes 1-7, 17.08s. Scenes 5-7 rebuilt as cards; 1-4 untouched.
+    01  3.000s  hook + typography      full-bleed
+    02  2.417s  walk                   full-bleed
+    03  2.125s  city, 50% slow motion  full-bleed
+    04  2.000s  reaction               full-bleed
+    05  2.042s  aslibella              4:5 card + brand type
+    06  2.500s  showcase               4:5 card + brand type
+    07  3.000s  mission                1:1 card + CREATE / BUILD / GROW type
+
+CREATE / BUILD / GROW RECOVERED. The sign is unusable in the plate — legible for
+~0.3s at the extreme frame edge — but the Scene 7 card leaves a lower band, and
+setting the line there in Inter puts it back in the film, on screen for the full
+3s instead of 0.3s, and legible. The dead space earns its keep.
+
+Scene 7 grade: raw is a strongly warm sunset silhouette at U=118.3. Even at
+mix=0.90 cooling it only reaches U=121.8, against a family of ~124. Settled at
+mix=0.75 (Y=66.1, U=120.8, V=131.2) — chasing the last two points would have
+drained a sunset of its warmth for a number nobody can see.
+
+KNOWN RISK, NOT YET RESOLVED: the film now runs full-bleed (1-4), cards (5-7),
+then full-bleed again for the end stills (8-9). That shrink-then-grow is the one
+thing that could read as a mistake rather than a choice. Mitigating factors: the
+card section is contiguous rather than alternating; the bed is a blurred grade of
+each shot's own frame so colour continuity holds across the boundary; and the
+switch lands on a cut that is already a hard change of place. Whether it holds is
+a judgement call for the client on the v3 cut, not something measurement settles.
+
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
 - 24 fps throughout, matching sources. No frame interpolation anywhere.
