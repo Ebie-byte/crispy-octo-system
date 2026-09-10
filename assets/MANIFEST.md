@@ -8,7 +8,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 |---|-------|------|--------|-------|
 | 1 | Hook — close-up + text | `scene01_closeup.MOV` | CONFIRMED | 1440x1440, 24fps, 4.11s |
 | 2 | Journey begins — walking | `scene02_walking.mp4` | CONFIRMED | 1080x1916, 24fps, 5.04s |
-| 3 | City / portfolio transformation | — | AWAITING `scene 3.mp4` | — |
+| 3 | City / portfolio transformation | `scene03_city.mp4` | CONFIRMED | 1576x1312, 24fps, 5.04s |
 | 4 | Vertexia storefront reveal | — | AWAITING `scene 4.mp4` | — |
 | 5 | Website showcase #1 — Aslibella | — | AWAITING `scene 5.mp4` | — |
 | 6 | Website showcase #2 / final transformation | — | AWAITING `scene 6.mp4` | — |
@@ -22,14 +22,14 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 |---|-------|---------:|-------|
 | 1 | Hook | 3.00s | fixed by brief |
 | 2 | Walk | 2.40s | capped by green-spill defect, not by choice |
-| 3 | City transformation | ~3.50s | provisional |
+| 3 | City transformation | 2.20s | 1.10s source at 50%, capped by billboard decay |
 | 4 | Vertexia reveal | ~3.00s | provisional |
 | 5 | Aslibella | ~3.50s | provisional, must end before the turn |
 | 6 | Showcase #2 | ~2.50s | client asked for fast |
 | 7 | Mission still | 3.00s | push-in / parallax |
 | 8 | Offer still | 2.75s | client asked 2.5-3s, must convert |
 | 9 | End card | 2.00s + 0.6s fade to black | |
-| | **Total** | **~26.25s** | inside the 22-27s target |
+| | **Total** | **~24.95s** | inside the 22-27s target |
 
 Scenes 3-6 are provisional and will be set from the real footage — cut points
 follow the movement in frame, not the spreadsheet.
@@ -50,6 +50,36 @@ follow the movement in frame, not the spreadsheet.
   cropped frame and white text on it would not hold. Face is never covered.
 - Source audio (aac) stripped.
 
+### Scene 3 — CONFIRMED
+- Cape Town. Subject from behind, Table Mountain centre, Vertexia billboard far
+  left, LuxeLash "Elevate Your Natural Beauty" billboard far right, "IDEAS BUILD
+  BRANDS" billboard centre-right. Matches brief.
+- Source is 1576x1312, LANDSCAPE (1.20:1). Full-bleed 9:16 costs 53% of width.
+- CROP LOCKED AT x=613 (of a 2306-wide scaled frame). Tested three positions:
+    x=300  too far left, subject falls out of frame
+    x=613  KEEPS the Vertexia logo and wordmark AND "IDEAS BUILD BRANDS",
+           subject right-of-frame, Table Mountain behind. Chosen.
+    x=900  best symmetry, but drops Vertexia entirely and puts the garbled
+           right-hand billboard on screen. Rejected.
+  The LuxeLash billboard cannot be kept: holding both it and the Vertexia logo
+  needs a 1426px window and only 1080 is available. Scene 4 is the dedicated
+  Vertexia beat, so Scene 3 leads with the logo and lets the rest go.
+- DEFECT: the billboards decay fast. This is generation drift in the source.
+      t=0.00  Vertexia headline + logo sharp, LuxeLash eye ad readable
+      t=0.50  LuxeLash ad already abstract
+      t=0.75  Vertexia logo + headline hold, body copy blurring
+      t=1.00  Vertexia logo + headline still legible — LAST GOOD FRAME
+      t=1.20  Vertexia billboard BLANK
+      t=1.70  right billboard garbled text, Vertexia dark purple
+      t=5.00  Vertexia billboard is an abstract pink shape, LuxeLash gone
+  USABLE WINDOW 0.00 -> 1.10s. Budget wanted 3.50s.
+- FIX: 50% motion-interpolated slow motion (setpts=2.0*PTS, minterpolate mci /
+  aobmc / vsbmc) turns the 1.1s clean window into 2.20s. Inspected at 100% crop:
+  no tearing on the pedestrians, wordmark stays legible. A 2.727x stretch to
+  2.88s also renders clean and is available if the scene needs more room.
+  Dramatically apt — he is standing still taking the city in.
+- Source audio (aac) stripped.
+
 ### Scene 2 — CONFIRMED
 - Full body, business district, low sun behind, walking toward camera.
 - NO CROP. Source is already 9:16. Only a 4px scale, 1916 -> 1920 (0.2%).
@@ -67,6 +97,16 @@ follow the movement in frame, not the spreadsheet.
   This is unrelated to cropping and would apply at any aspect ratio.
 - Forward motion matches Scene 1's push-in. Cut on motion, no dissolve.
 - Out-point placed on a stride phase to motion-match into Scene 3.
+
+## SYSTEMIC WARNING
+Every video asset received so far degrades in its back half, and the clean
+window keeps shrinking:
+    Scene 1  clean throughout (4.11s)
+    Scene 2  clean to 2.40s of 5.04s  (green spill on the jacket)
+    Scene 3  clean to 1.10s of 5.04s  (billboard content dissolves)
+Assume Scenes 4-6 do the same. Each will be probed for its clean window before
+any timing is promised, and motion-interpolated slow motion is the standing
+remedy where a window is shorter than the beat needs.
 
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
