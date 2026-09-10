@@ -202,36 +202,61 @@ The six clips arrived as two different-looking films. Measured before grading:
 Two faults: brightness spanned 53.9-102.9, nearly 2x, with Scene 2 the outlier;
 and colour split into a warm family (1,2,4) and a neutral family (3,6).
 
-Grade applied per scene, then re-measured:
+Grade applied per scene, then re-measured. A FIRST PASS used global brightness
+cuts and heavy cooling; it converged the numbers but crushed Scene 2's backlit
+face to shadow and greyed out the golden hour. Replaced with highlight roll-off
+via curves, so the tone is compressed from the top rather than the whole image
+pulled down. Final measurements:
 
     scene        Y      U      V
-    1            68.1   124.6  133.4
-    2            74.0   124.8  131.3
-    3            70.3   122.8  133.6
-    4            69.0   124.6  133.3
-    5            55.0   124.5  132.5
-    6            50.1   125.2  130.5
+    1            81.9   123.9  133.7
+    2            85.3   123.1  132.0
+    3            78.5   124.9  131.9
+    4            83.0   123.9  133.8
+    5            59.6   124.4  132.3
+    6            55.3   126.8  129.9
 
-    U spread  9.2 -> 2.4
-    V spread  9.4 -> 3.1
-    Scenes 1-4 now sit within 6 points of brightness.
+    Scenes 1-4 brightness spread  27.5 -> 6.8
+    U spread                       9.2 -> 3.7
+    V spread                       9.4 -> 3.9
 
-Scenes 5 and 6 are deliberately left darker. Their designs are black/pink and
+Scenes 5 and 6 are deliberately left dark. Their designs are black/pink and
 navy/gold; lifting them to match would wreck the client work the film exists to
 sell. The goal was never one flat number — it was removing the JUMP at each cut
 while letting scene-appropriate variation stand.
 
 Filter chain per scene (geometry first, then grade):
-    1  eq=brightness=-0.008:contrast=1.03:saturation=1.02, colortemperature=9800 mix=0.85
-    2  eq=brightness=-0.082:contrast=1.06:saturation=1.02, colortemperature=9400 mix=0.80
-    3  eq=brightness= 0.012:contrast=1.03:saturation=1.05, colortemperature=3900 mix=0.80
-    4  eq=brightness= 0.022:contrast=1.02:saturation=1.02, colortemperature=9800 mix=0.85
-    5  eq=brightness= 0.014:contrast=1.04:saturation=1.03, colortemperature=6100 mix=0.35
-    6  eq=brightness= 0.024:contrast=1.03:saturation=1.04, colortemperature=4000 mix=0.75
+  1  curves=all='0/0 0.3/0.30 0.7/0.68 1/0.94',
+     eq=brightness=0.055:contrast=1.04:saturation=1.06, colortemperature=9800 mix=0.62
+  2  curves=all='0/0 0.3/0.29 0.65/0.57 1/0.86',
+     eq=brightness=0.008:contrast=1.05:saturation=1.10, colortemperature=9400 mix=0.40
+  3  eq=brightness=0.048:contrast=1.04:saturation=1.06, colortemperature=4300 mix=0.62
+  4  curves=all='0/0 0.3/0.30 0.7/0.68 1/0.94',
+     eq=brightness=0.070:contrast=1.03:saturation=1.06, colortemperature=9800 mix=0.62
+  5  eq=brightness=0.032:contrast=1.05:saturation=1.05, colortemperature=6300 mix=0.30
+  6  eq=brightness=0.042:contrast=1.04:saturation=1.06, colortemperature=4400 mix=0.55
 
-OPEN QUESTION: Scene 3 warming at mix=0.80 mutes the Cape Town sky from punchy
-blue toward blue-grey. Continuity gained, postcard blue lost. Worth a look —
-dropping to mix=0.65 keeps more sky at the cost of some convergence.
+Scene 3 warming was reduced from mix=0.80 to 0.62 — the earlier value muted the
+Cape Town sky to blue-grey. At 0.62 the sky keeps its blue and the clip still
+sits in the family.
+
+## FOOTAGE ACT RENDERED — VERTEXIA_footage_act_v2.mp4
+Scenes 1-6 cut together, graded, 14.08s. This is a continuity test, not the
+final assembly: Scenes 7-9 (the three stills) are still outstanding.
+    01  3.000s   hook + typography
+    02  2.417s   walk
+    03  2.125s   city, 50% slow motion
+    04  2.000s   reaction
+    05  2.042s   aslibella, drifting counter-crop
+    06  2.500s   showcase, phone-forward
+Verified frame-by-frame either side of all five cuts: grade holds across every
+boundary, no flash, no colour shift.
+
+RENDER PERFORMANCE NOTE: x264 preset slow at CRF 16 on this upscaled, grainy
+footage cost 11 minutes and 86 Mbps for a single 3s segment. The geq-generated
+scrim was worse — it evaluates a per-pixel expression every frame. Scrim is now
+a pre-baked PNG and the preset is veryfast/CRF 18: the same segment renders in
+2.8s. Final master can afford a slower preset; previews should not.
 
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
