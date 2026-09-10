@@ -13,8 +13,8 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 5 | Website showcase #1 — Aslibella | `scene05_aslibella.mov` | CONFIRMED | 1576x1312, 24fps, 2.02s |
 | 6 | Website showcase #2 — Brioche & Co | `scene06_showcase2.mp4` | CONFIRMED | 1764x1176, 24fps, 5.04s |
 | 7 | Mission — More Businesses Next | `scene07_mission.mp4` | CONFIRMED | 1916x1080, 24fps, 5.04s — VIDEO not a still |
-| 8 | The offer — R3,500 / $500 still | — | AWAITING still | — |
-| 9 | End card — IDEAS INTO IMPACT still | — | AWAITING still | — |
+| 8 | The offer — R3,500 / $500 | — | **PENDING FILE** | seen inline, never reached disk |
+| 9 | End card — IDEAS INTO IMPACT | — | **PENDING FILE** | seen inline, never reached disk |
 
 ## Timing budget (target ~26s)
 
@@ -334,6 +334,43 @@ card section is contiguous rather than alternating; the bed is a blurred grade o
 each shot's own frame so colour continuity holds across the boundary; and the
 switch lands on a cut that is already a hard change of place. Whether it holds is
 a judgement call for the client on the v3 cut, not something measurement settles.
+
+## SCENES 8 AND 9 — SEEN BUT NOT RECEIVED
+Both stills were pasted inline in conversation. Neither reached the filesystem;
+the uploads directory still ends at scene_7.mp4. They cannot be rendered from an
+image that is only visible — the pixels are needed. Client asked to re-send as
+attachments, a repo commit, or a direct link.
+
+What can be said from looking at them:
+  Scene 8  landscape ~3:2. "R3,500 / $500" spans a bit over half the image width,
+           so a full-bleed 9:16 crop (which keeps ~38%) would slice the edges off
+           the price — the most important element in the film. Needs a card.
+  Scene 9  landscape ~16:9. Type block ("IDEAS INTO IMPACT." + rule + the URL)
+           sits left of centre; the logo mark occupies the right and bleeds off
+           the edge. A centre crop would cut the URL and bisect the mark.
+           Needs a card.
+
+Both stills carry their own typography, so NOTHING is set over them. Their cards
+sit on a near-black bed with no added type.
+
+THIS RESOLVES THE SHRINK-THEN-GROW RISK. With 8 and 9 also on cards the film
+becomes two clean acts — full-bleed 1-4 (the world), cards 5-9 (the work, the
+offer, the brand) — instead of a card section that pops back to full-bleed. The
+film never grows back; it resolves. Scene 9's black background also means its
+card boundary is invisible, so the end card reads as full-bleed anyway.
+
+Scene 8 is given 3.50s rather than the budgeted 2.75s: three tiers of information
+to read, it is the frame that has to convert, and the runtime can afford it.
+
+## BUILD SCRIPT — ../build.sh
+The whole film renders from one command:
+
+    ./build.sh <scene8-image> <scene9-image>
+
+Verified end to end with stand-in stills: 1080x1920, 24fps, 23.33s, h264 + silent
+stereo AAC, faststart. Every decision in this manifest is encoded in it, with the
+reasoning in comments at each cut. QUALITY=final swaps CRF 18/veryfast for
+CRF 16/slower for the deliverable.
 
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
