@@ -380,7 +380,49 @@ card boundary is invisible, so the end card reads as full-bleed anyway.
 Scene 8 is given 3.50s rather than the budgeted 2.75s: three tiers of information
 to read, it is the frame that has to convert, and the runtime can afford it.
 
-## DELIVERED — VERTEXIA_FINAL.mp4
+## RECUT — VERTEXIA_FINAL_v2.mp4 (current deliverable)
+Client asked to open on the crosswalk and replace the hook, acting on the
+critique that the strongest image in the film was buried at position 3 and the
+original hook was generic.
+
+NEW ORDER — the film now leads with the concept, not a face:
+    1  crosswalk + hook   2.875s  full-bleed, 2.727x slow motion
+    2  reaction           2.000s  full-bleed
+    3  walk               2.400s  full-bleed
+    4  close-up           2.000s  full-bleed, no type
+    5  aslibella          2.042s  4:5 card
+    6  brioche            2.500s  4:5 card
+    7  mission            3.000s  1:1 card
+    8  offer              3.500s  card, enlarged
+    9  end card           2.600s  full width on black, fade out
+    total 23.125s
+
+NEW HOOK:
+    "Websites like these."
+    "From R3,500."
+Set at 74px on two lines, second line semibold. The earlier single line
+("Websites like these. From R3,500.") capped at 58px — that string is as wide as
+1080 allows on one line, and 58px is too quiet to stop a scroll. Breaking it in
+two bought 16px of type size and a beat between the claim and the number.
+
+The old hook is gone entirely: "Tired of boring websites? / Come explore what's
+possible." was the opening every web agency uses, and it sat over a face — the
+most conventional image available — while the striking one waited at position 3.
+
+WHY THE CROSSWALK CAN OPEN. It needs 2.875s to carry two lines of type, but its
+billboards are legible for only 1.10s. The 2.727x stretch validated earlier
+covers exactly this, and the Vertexia billboard stays readable for the whole
+hook — so the brand is on screen, in the client's own asset, in second one.
+That also answers the weak-name-recall problem noted in the critique.
+
+The crosswalk/reaction shot-reverse pair SURVIVES the reorder and is now
+tighter: the wide shot of him facing the billboards cuts straight to his face
+reacting, instead of being separated by two scenes.
+
+The close-up drops from 3.000s to 2.000s and loses its typography, since it no
+longer opens the film. In-point moved to 0.60 to sit in the middle of its push-in.
+
+## SUPERSEDED — VERTEXIA_FINAL.mp4
 1080x1920, 9:16, 24fps, h264 CRF 16, silent stereo AAC, faststart.
 23.33s, inside the 22-27s target. Renders in ~75s.
 

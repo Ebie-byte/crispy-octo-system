@@ -35,8 +35,8 @@ G7="curves=all='0/0 0.3/0.30 0.65/0.60 1/0.88',eq=brightness=0.060:contrast=1.04
 
 BED="gblur=sigma=60,eq=brightness=-0.30:saturation=0.6"
 
-printf 'Tired of boring websites?'      > "$WORK/t1.txt"
-printf "Come explore what's possible."  > "$WORK/t2.txt"
+printf 'Websites like these.' > "$WORK/t1.txt"
+printf 'From R3,500.'         > "$WORK/t2.txt"
 printf 'ASLIBELLA LASH STUDIO'          > "$WORK/l5.txt"
 printf 'BRIOCHE & CO.'                  > "$WORK/l6.txt"
 printf 'built by Vertexia Web Studios'  > "$WORK/lsub.txt"
@@ -61,25 +61,31 @@ open(sys.argv[1], 'wb').write(png)
 PY
 
 say(){ printf '  %s\n' "$*" >&2; }
-say "1/9 hook"
-ffmpeg -v error -t 3.0 -i "$A/scene01_closeup.MOV" -i "$WORK/scrim.png" -filter_complex "\
-[0:v]scale=1920:1920,crop=1080:1920:420:0,$G1,setsar=1[b];[b][1:v]overlay=0:1140[m];\
-[m]drawtext=fontfile=$FM:textfile=$WORK/t1.txt:fontcolor=white:fontsize=64:x=(w-tw)/2:y=1560:alpha='min(max((t-0.35)/0.55\,0)\,0.97)',\
-drawtext=fontfile=$FM:textfile=$WORK/t2.txt:fontcolor=white:fontsize=40:x=(w-tw)/2:y=1668:alpha='min(max((t-1.55)/0.55\,0)\,0.6)'[v]" \
+# OPENS THE FILM. The billboards are only legible for 1.10s of plate, so the
+# clean window is stretched 2.727x with motion interpolation to 2.88s - enough
+# for the hook to land while the Vertexia billboard is still readable. Opening
+# on the city rather than a face leads with the surprising image.
+say "1/9 crosswalk + hook"
+ffmpeg -v error -t 1.1 -i "$A/scene03_city.mp4" -i "$WORK/scrim.png" -filter_complex "\
+[0:v]scale=2306:1920,crop=1080:1920:613:0,setpts=2.727*PTS,minterpolate=fps=24:mi_mode=mci:mc_mode=aobmc:vsbmc=1,$G3,setsar=1[b];\
+[b][1:v]overlay=0:1140[m];\
+[m]drawtext=fontfile=$FM:textfile=$WORK/t1.txt:fontcolor=white:fontsize=74:x=(w-tw)/2:y=1476:alpha='min(max((t-0.25)/0.45\,0)\,0.98)',\
+drawtext=fontfile=$FB:textfile=$WORK/t2.txt:fontcolor=white:fontsize=74:x=(w-tw)/2:y=1584:alpha='min(max((t-1.15)/0.45\,0)\,0.98)'[v]" \
  -map "[v]" $ENC -y "$WORK/01.mp4"
 
+# Reverse angle on the shot above: he is looking at those billboards. In 0.70 /
+# out 2.70 clears the blink at source 1.70 and lands on the look to camera.
+say "2/9 reaction"
+ffmpeg -v error -ss 0.7 -t 2.0 -i "$A/scene04_reaction.mp4" -filter_complex "[0:v]scale=2457:1920,crop=1080:1920:688:0,$G4,setsar=1[v]" -map "[v]" $ENC -y "$WORK/02.mp4"
+
 # Cut at 2.40s: a green light-spill artifact grows on the jacket past that point.
-say "2/9 walk"
-ffmpeg -v error -t 2.4 -i "$A/scene02_walking.mp4" -filter_complex "[0:v]scale=1080:1920,$G2,setsar=1[v]" -map "[v]" $ENC -y "$WORK/02.mp4"
+say "3/9 walk"
+ffmpeg -v error -t 2.4 -i "$A/scene02_walking.mp4" -filter_complex "[0:v]scale=1080:1920,$G2,setsar=1[v]" -map "[v]" $ENC -y "$WORK/03.mp4"
 
-# Billboards dissolve after 1.10s, so the clean window is stretched 2x with
-# motion interpolation rather than cut short.
-say "3/9 city"
-ffmpeg -v error -t 1.1 -i "$A/scene03_city.mp4" -filter_complex "[0:v]scale=2306:1920,crop=1080:1920:613:0,setpts=2.0*PTS,minterpolate=fps=24:mi_mode=mci:mc_mode=aobmc:vsbmc=1,$G3,setsar=1[v]" -map "[v]" $ENC -y "$WORK/03.mp4"
-
-# In 0.70 / out 2.70 clears the blink at source 1.70 and lands on the look to camera.
-say "4/9 reaction"
-ffmpeg -v error -ss 0.7 -t 2.0 -i "$A/scene04_reaction.mp4" -filter_complex "[0:v]scale=2457:1920,crop=1080:1920:688:0,$G4,setsar=1[v]" -map "[v]" $ENC -y "$WORK/04.mp4"
+# The close-up no longer opens the film, so it carries no type and runs 2.00s
+# instead of 3.00s. In 0.60 uses the middle of the slow push-in.
+say "4/9 close-up"
+ffmpeg -v error -ss 0.6 -t 2.0 -i "$A/scene01_closeup.MOV" -filter_complex "[0:v]scale=1920:1920,crop=1080:1920:420:0,$G1,setsar=1[v]" -map "[v]" $ENC -y "$WORK/04.mp4"
 
 say "5/9 aslibella card"
 ffmpeg -v error -i "$A/scene05_aslibella.mov" -filter_complex "\
