@@ -21,7 +21,7 @@ FM="$FONTDIR/InterDisplay-Medium.ttf"
 FR="$FONTDIR/Inter-Regular.ttf"
 
 # Preview renders fast; pass QUALITY=final for the deliverable.
-if [ "${QUALITY:-preview}" = "final" ]; then ENCOPTS="-crf 16 -preset slower"; else ENCOPTS="-crf 18 -preset veryfast"; fi
+if [ "${QUALITY:-preview}" = "final" ]; then ENCOPTS="-crf 16 -preset slow"; else ENCOPTS="-crf 18 -preset veryfast"; fi
 ENC="-an -c:v libx264 $ENCOPTS -pix_fmt yuv420p -r 24 -video_track_timescale 24000"
 
 # --- per-scene grade, measured and matched; see assets/MANIFEST.md ---
@@ -109,10 +109,18 @@ ffmpeg -v error -t 3.0 -i "$A/scene07_mission.mp4" -filter_complex "\
 # Stills 8 and 9 carry their own typography, so nothing is added over them.
 # Full width on a near-black bed: both assets are dark at the edges, so the card
 # boundary reads as part of the design rather than as a letterbox.
+# The offer is the frame that has to convert, so it must not be the smallest
+# thing on screen. Its type is centred with symmetric 363/358px margins, so a
+# symmetric crop enlarges the card without altering the layout: 1000 of 1524
+# columns gives a 1115px-tall card instead of 731, with ~105px of breathing room
+# either side of the price. Cropped by proportion so it holds for any source size.
 say "8/9 offer"
+S8W=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$S8")
+S8CW=$(python3 -c "print(int($S8W*0.656))")
 ffmpeg -v error -loop 1 -t 3.5 -i "$S8" -filter_complex "\
 color=c=0x08080Aff:s=1080x1920:d=3.5[bed];\
-[0:v]scale=1080:-2,setsar=1[card];[bed][card]overlay=0:(H-h)/2:shortest=1,setsar=1[v]" -map "[v]" $ENC -y "$WORK/08.mp4"
+[0:v]crop=$S8CW:ih:(iw-$S8CW)/2:0,scale=1080:-2,setsar=1[card];\
+[bed][card]overlay=0:(H-h)/2:shortest=1,setsar=1[v]" -map "[v]" $ENC -y "$WORK/08.mp4"
 
 say "9/9 end card"
 ffmpeg -v error -loop 1 -t 2.6 -i "$S9" -filter_complex "\

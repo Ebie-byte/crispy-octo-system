@@ -13,8 +13,8 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 5 | Website showcase #1 — Aslibella | `scene05_aslibella.mov` | CONFIRMED | 1576x1312, 24fps, 2.02s |
 | 6 | Website showcase #2 — Brioche & Co | `scene06_showcase2.mp4` | CONFIRMED | 1764x1176, 24fps, 5.04s |
 | 7 | Mission — More Businesses Next | `scene07_mission.mp4` | CONFIRMED | 1916x1080, 24fps, 5.04s — VIDEO not a still |
-| 8 | The offer — R3,500 / $500 | — | **PENDING FILE** | seen inline, never reached disk |
-| 9 | End card — IDEAS INTO IMPACT | — | **PENDING FILE** | seen inline, never reached disk |
+| 8 | The offer — R3,500 / $500 | `scene08_offer.png` | CONFIRMED | 1524x1032 still |
+| 9 | End card — IDEAS INTO IMPACT | `scene09_endcard.png` | CONFIRMED | 1672x941 still |
 
 ## Timing budget (target ~26s)
 
@@ -335,20 +335,38 @@ each shot's own frame so colour continuity holds across the boundary; and the
 switch lands on a cut that is already a hard change of place. Whether it holds is
 a judgement call for the client on the v3 cut, not something measurement settles.
 
-## SCENES 8 AND 9 — SEEN BUT NOT RECEIVED
-Both stills were pasted inline in conversation. Neither reached the filesystem;
-the uploads directory still ends at scene_7.mp4. They cannot be rendered from an
-image that is only visible — the pixels are needed. Client asked to re-send as
-attachments, a repo commit, or a direct link.
+## SCENES 8 AND 9 — RECOVERED FROM THE SESSION TRANSCRIPT
+Both stills were pasted inline rather than attached, so neither reached the
+filesystem — a search of the whole volume found nothing. Pasted images are still
+carried in the session JSONL as base64, so they were extracted from
+/root/.claude/projects/.../<session>.jsonl (webp blocks at lines 914 and 930) and
+decoded to PNG. Verified against what the client posted: identical.
 
-What can be said from looking at them:
-  Scene 8  landscape ~3:2. "R3,500 / $500" spans a bit over half the image width,
-           so a full-bleed 9:16 crop (which keeps ~38%) would slice the edges off
-           the price — the most important element in the film. Needs a card.
-  Scene 9  landscape ~16:9. Type block ("IDEAS INTO IMPACT." + rule + the URL)
-           sits left of centre; the logo mark occupies the right and bleeds off
-           the edge. A centre crop would cut the URL and bisect the mark.
-           Needs a card.
+CAVEAT: these went through the conversation's image pipeline, so they may be
+recompressed or downscaled relative to the client's originals. Both are larger
+than the 1080px width they are rendered at, so nothing is upscaled and the
+result is sound — but if the originals are ever supplied, swapping them in and
+re-running build.sh costs nothing.
+
+Measured from the recovered files:
+  Scene 8  1524x1032. White type occupies x=363-1166, i.e. 53% of the width, and
+           it is genuinely centred (margins 363 left, 358 right). A full-bleed
+           9:16 crop keeps ~38% and would slice the edges off the price.
+           A first white-pixel pass read the right edge as x=1365; that was a
+           bright city light, not type. The column profile corrected it.
+  Scene 9  1672x941. Content spans x=172-1670 — only a 10% dead margin on the
+           left and none on the right. There is nothing to crop, so it plays at
+           full width, 608px tall. Because its background is pure black and the
+           bed is black, the card boundary is invisible: it reads as type and
+           logo floating on black, which is what an end card should be.
+
+OFFER CARD ENLARGED. At full width Scene 8 was 731px tall — the smallest element
+in the film, on the one frame that has to convert somebody. Because its type is
+symmetrically centred, a symmetric crop enlarges the card without altering the
+layout. Cropping to 65.6% of the width gives a 1115px-tall card with ~105px of
+clearance either side of the price. Compared three sizes before choosing: full
+width read as an afterthought, and the tightest safe crop (880px, 1266 tall) put
+the price uncomfortably near the edge.
 
 Both stills carry their own typography, so NOTHING is set over them. Their cards
 sit on a near-black bed with no added type.
@@ -361,6 +379,21 @@ card boundary is invisible, so the end card reads as full-bleed anyway.
 
 Scene 8 is given 3.50s rather than the budgeted 2.75s: three tiers of information
 to read, it is the frame that has to convert, and the runtime can afford it.
+
+## DELIVERED — VERTEXIA_FINAL.mp4
+1080x1920, 9:16, 24fps, h264 CRF 16, silent stereo AAC, faststart.
+23.33s, inside the 22-27s target. Renders in ~75s.
+
+    scene                      dur     treatment
+    1  hook                   3.000s   full-bleed + typography
+    2  walk                   2.417s   full-bleed
+    3  city                   2.125s   full-bleed, 50% slow motion
+    4  reaction               2.000s   full-bleed
+    5  aslibella              2.042s   4:5 card + brand type
+    6  brioche                2.500s   4:5 card + brand type
+    7  mission                3.000s   1:1 card + CREATE / BUILD / GROW type
+    8  offer                  3.500s   card, enlarged
+    9  end card               2.600s   full-width on black, 0.6s fade out
 
 ## BUILD SCRIPT — ../build.sh
 The whole film renders from one command:
