@@ -11,7 +11,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 3 | City / portfolio transformation | `scene03_city.mp4` | CONFIRMED | 1576x1312, 24fps, 5.04s |
 | 4 | Reaction — impressed, looking around | `scene04_reaction.mp4` | CONFIRMED | 1628x1272, 24fps, 5.04s |
 | 5 | Website showcase #1 — Aslibella | `scene05_aslibella.mov` | CONFIRMED | 1576x1312, 24fps, 2.02s |
-| 6 | Website showcase #2 / final transformation | — | AWAITING `scene 6.mp4` | — |
+| 6 | Website showcase #2 — Brioche & Co | `scene06_showcase2.mp4` | CONFIRMED | 1764x1176, 24fps, 5.04s |
 | 7 | Mission — CREATE / BUILD / GROW still | — | AWAITING still | — |
 | 8 | The offer — R3,500 / $500 still | — | AWAITING still | — |
 | 9 | End card — IDEAS INTO IMPACT still | — | AWAITING still | — |
@@ -25,7 +25,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 3 | City transformation | 2.20s | 1.10s source at 50%, capped by billboard decay |
 | 4 | Reaction — impressed | 2.00s | in 0.70, out 2.70 |
 | 5 | Aslibella | 2.04s | full source; he never turns, no trim needed |
-| 6 | Showcase #2 | ~2.50s | client asked for fast |
+| 6 | Showcase #2 | 2.50s | in 1.00, out 3.50 |
 | 7 | Mission still | 3.00s | push-in / parallax |
 | 8 | Offer still | 2.75s | client asked 2.5-3s, must convert |
 | 9 | End card | 2.00s + 0.6s fade to black | |
@@ -54,6 +54,28 @@ Scene 7 push-in. The stills are the only elastic material in the film.
 - Text sits over a soft bottom scrim (black, alpha ramped to 0.88 over the
   lower 760px). The scrim is needed: the white shirt sits centre-bottom in the
   cropped frame and white text on it would not hold. Face is never covered.
+- Source audio (aac) stripped.
+
+### Scene 6 — CONFIRMED
+- Brioche & Co Bake House device mockup. Navy/gold, "CINNAMON ROLLS / Like No
+  Other", laptop and phone showing the same design. Clean throughout, no decay.
+- WIDEST SOURCE IN THE FILM: 1764x1176 (1.5:1). Scaled to 1920 tall it is 2880
+  wide; the laptop and phone together span 2325px of that. 1080 is available.
+  Both devices cannot be held in one full-bleed frame. This is arithmetic.
+- Also note the laptop headline alone spans ~1108px once the camera has pushed
+  in — wider than the frame. It can never be shown complete after ~t=1.0.
+- TESTED TWO TREATMENTS:
+    PAN (laptop -> phone, eased): rejected. The midpoint of the move shows the
+      headline cut in half — reads as a mistake, not a reveal.
+    PHONE-FORWARD (crop x=1760->1830, native push-in kept): CHOSEN. The phone
+      carries the identical design and is fully legible start to finish, with
+      the laptop bleeding in at frame left. A vertical device filling a vertical
+      frame, which is what the viewer is literally holding.
+- The phone-forward choice also protects continuity: Scene 5 ends pushing in on
+  the Aslibella storefront and Scene 6 pushes in on the phone. Cutting push-in to
+  push-in carries the forward motion across the film's biggest tonal break —
+  Cape Town street to studio tabletop. A lateral pan would have broken it.
+- CUT: in 1.00, out 3.50 -> 2.50s. Client asked for fast.
 - Source audio (aac) stripped.
 
 ### Scene 5 — CONFIRMED
@@ -160,9 +182,56 @@ window keeps shrinking:
     Scene 3  clean to 1.10s of 5.04s  (billboard content dissolves)
     Scene 4  CLEAN THROUGHOUT (5.04s) — portrait, no decay
     Scene 5  CLEAN THROUGHOUT (2.02s) — but the source is only 2.02s long
+    Scene 6  CLEAN THROUGHOUT (5.04s)
 Scene 4 broke the pattern. Assume Scenes 5-6 may still follow it. Each will be probed for its clean window before
 any timing is promised, and motion-interpolated slow motion is the standing
 remedy where a window is shorter than the beat needs.
+
+## COLOUR GRADE — MEASURED AND MATCHED
+
+The six clips arrived as two different-looking films. Measured before grading:
+
+    scene        Y      U      V     reads as
+    1 hook       82.0   120.8  137.5 warm, golden hour
+    2 walk      102.9   120.7  135.1 warm but MUCH brighter
+    3 city       78.9   129.9  128.3 neutral/blue daylight
+    4 reaction   75.4   120.8  137.5 warm
+    5 aslibella  57.9   125.6  132.5 slightly warm, dark
+    6 showcase   53.9   129.7  128.1 neutral, darkest
+
+Two faults: brightness spanned 53.9-102.9, nearly 2x, with Scene 2 the outlier;
+and colour split into a warm family (1,2,4) and a neutral family (3,6).
+
+Grade applied per scene, then re-measured:
+
+    scene        Y      U      V
+    1            68.1   124.6  133.4
+    2            74.0   124.8  131.3
+    3            70.3   122.8  133.6
+    4            69.0   124.6  133.3
+    5            55.0   124.5  132.5
+    6            50.1   125.2  130.5
+
+    U spread  9.2 -> 2.4
+    V spread  9.4 -> 3.1
+    Scenes 1-4 now sit within 6 points of brightness.
+
+Scenes 5 and 6 are deliberately left darker. Their designs are black/pink and
+navy/gold; lifting them to match would wreck the client work the film exists to
+sell. The goal was never one flat number — it was removing the JUMP at each cut
+while letting scene-appropriate variation stand.
+
+Filter chain per scene (geometry first, then grade):
+    1  eq=brightness=-0.008:contrast=1.03:saturation=1.02, colortemperature=9800 mix=0.85
+    2  eq=brightness=-0.082:contrast=1.06:saturation=1.02, colortemperature=9400 mix=0.80
+    3  eq=brightness= 0.012:contrast=1.03:saturation=1.05, colortemperature=3900 mix=0.80
+    4  eq=brightness= 0.022:contrast=1.02:saturation=1.02, colortemperature=9800 mix=0.85
+    5  eq=brightness= 0.014:contrast=1.04:saturation=1.03, colortemperature=6100 mix=0.35
+    6  eq=brightness= 0.024:contrast=1.03:saturation=1.04, colortemperature=4000 mix=0.75
+
+OPEN QUESTION: Scene 3 warming at mix=0.80 mutes the Cape Town sky from punchy
+blue toward blue-grey. Continuity gained, postcard blue lost. Worth a look —
+dropping to mix=0.65 keeps more sky at the cost of some convergence.
 
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
