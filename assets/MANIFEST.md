@@ -9,7 +9,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 1 | Hook — close-up + text | `scene01_closeup.MOV` | CONFIRMED | 1440x1440, 24fps, 4.11s |
 | 2 | Journey begins — walking | `scene02_walking.mp4` | CONFIRMED | 1080x1916, 24fps, 5.04s |
 | 3 | City / portfolio transformation | `scene03_city.mp4` | CONFIRMED | 1576x1312, 24fps, 5.04s |
-| 4 | Vertexia storefront reveal | **MISMATCH** | BLOCKED | file sent is the Good Design portrait, not the storefront |
+| 4 | Reaction — impressed, looking around | `scene04_reaction.mp4` | CONFIRMED | 1628x1272, 24fps, 5.04s |
 | 5 | Website showcase #1 — Aslibella | — | AWAITING `scene 5.mp4` | — |
 | 6 | Website showcase #2 / final transformation | — | AWAITING `scene 6.mp4` | — |
 | 7 | Mission — CREATE / BUILD / GROW still | — | AWAITING still | — |
@@ -23,13 +23,13 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 1 | Hook | 3.00s | fixed by brief |
 | 2 | Walk | 2.40s | capped by green-spill defect, not by choice |
 | 3 | City transformation | 2.20s | 1.10s source at 50%, capped by billboard decay |
-| 4 | Vertexia reveal | ~3.00s | provisional |
+| 4 | Reaction — impressed | 2.00s | in 0.70, out 2.70 |
 | 5 | Aslibella | ~3.50s | provisional, must end before the turn |
 | 6 | Showcase #2 | ~2.50s | client asked for fast |
 | 7 | Mission still | 3.00s | push-in / parallax |
 | 8 | Offer still | 2.75s | client asked 2.5-3s, must convert |
 | 9 | End card | 2.00s + 0.6s fade to black | |
-| | **Total** | **~24.95s** | inside the 22-27s target |
+| | **Total** | **~23.95s** | inside 22-27s, with room to extend Scenes 5-6 |
 
 Scenes 3-6 are provisional and will be set from the real footage — cut points
 follow the movement in frame, not the spreadsheet.
@@ -50,25 +50,30 @@ follow the movement in frame, not the spreadsheet.
   cropped frame and white text on it would not hold. Face is never covered.
 - Source audio (aac) stripped.
 
-### Scene 4 — MISMATCH, SLOT STILL EMPTY
-- File received: `scene04_storefront.mp4`, 1628x1272 landscape, 24fps, 5.04s.
-- CONTENT DOES NOT MATCH THE SLOT. The brief for Scene 4 is the VERTEXIA
-  STOREFRONT — the shopfront with the blue/purple logo and window text, the beat
-  that tells the viewer who is behind the websites. This file contains no
-  storefront at any point. Checked t=0.0, 0.6, 1.2, 1.8, 2.6, 3.6, 5.0.
-- What the file actually is: the "Good Design Builds Bigger Businesses" portrait
-  — Scene 10 of the original 12-scene brief. Subject in profile looking off-left
-  with the wall sign behind, turning to face camera by ~2.6s and holding.
-- The sign is legible only 0.00 -> 0.30s. By 0.40s it is blurring, by 0.60s the
-  camera has drifted right and it is out of frame entirely.
-- WORSE, UNDER TREATMENT A: the 9:16 full-bleed crop removes the sign completely.
-  Tested x=400 (partial letters, subject badly placed) and x=688 (sign gone,
-  strong portrait). There is no crop that holds both the sign and the subject.
-  In a vertical master this clip cannot deliver that line as on-screen text.
-  If the line is wanted, it has to be typography, not the wall sign.
-- The clip is still a strong asset: the turn to camera is a natural address-the-
-  viewer beat and belongs late, just before the offer — not at position 4.
-- Kept in `assets/` pending a decision. Not assigned to a slot.
+### Scene 4 — CONFIRMED (reframed by client)
+- The Vertexia storefront beat is REMOVED FROM THE FILM ENTIRELY. Scene 4 is now
+  the reaction: he has entered the city, seen the designs in Scene 3, and is
+  looking around impressed.
+- Source 1628x1272 landscape. Crop x=688 of a 2457-wide scaled frame. That is a
+  tight portrait; the "Good Design Builds Bigger Businesses" wall sign is cropped
+  out. No loss — the sign was only legible to 0.30s in the source anyway, and no
+  crop existed that held both it and the subject.
+- SHOT/REVERSE PAIR WITH SCENE 3. Scene 3 is him from behind facing the
+  billboards; Scene 4 is the reverse angle on his face. The eyeline matches too:
+  the Vertexia billboard is screen-left in Scene 3 and he looks off screen-left
+  here. That pairing is why removing the storefront strengthens the cut rather
+  than leaving a hole.
+- NO DEGRADATION. Clean through 5.04s — the first clip since Scene 1 with a full
+  usable run. Only the framing moves: the camera drifts right over the clip.
+- Turn timing, measured:
+      t=1.40  profile, looking off-left
+      t=1.70  mid-turn, EYES CLOSED — do not cut here
+      t=2.00  facing camera, slight smile
+      t=2.30  facing camera, settled
+- CUT: in 0.70, out 2.70 -> 2.00s. Gives ~0.6s of profile taking the city in,
+  the turn landing ~1.2s in, then ~0.8s held on camera. Ending on the look to
+  camera hands off into the Scene 5 showcase as "let me show you".
+- Source audio (aac) stripped.
 
 ### Scene 3 — CONFIRMED
 - Cape Town. Subject from behind, Table Mountain centre, Vertexia billboard far
@@ -124,8 +129,8 @@ window keeps shrinking:
     Scene 1  clean throughout (4.11s)
     Scene 2  clean to 2.40s of 5.04s  (green spill on the jacket)
     Scene 3  clean to 1.10s of 5.04s  (billboard content dissolves)
-    Scene 4* clean to 0.30s of 5.04s  (wall sign leaves frame)  *misfiled clip
-Assume Scenes 4-6 do the same. Each will be probed for its clean window before
+    Scene 4  CLEAN THROUGHOUT (5.04s) — portrait, no decay
+Scene 4 broke the pattern. Assume Scenes 5-6 may still follow it. Each will be probed for its clean window before
 any timing is promised, and motion-interpolated slow motion is the standing
 remedy where a window is shorter than the beat needs.
 
