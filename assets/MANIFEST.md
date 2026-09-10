@@ -12,7 +12,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 4 | Reaction — impressed, looking around | `scene04_reaction.mp4` | CONFIRMED | 1628x1272, 24fps, 5.04s |
 | 5 | Website showcase #1 — Aslibella | `scene05_aslibella.mov` | CONFIRMED | 1576x1312, 24fps, 2.02s |
 | 6 | Website showcase #2 — Brioche & Co | `scene06_showcase2.mp4` | CONFIRMED | 1764x1176, 24fps, 5.04s |
-| 7 | Mission — CREATE / BUILD / GROW still | — | AWAITING still | — |
+| 7 | Mission — More Businesses Next | `scene07_mission.mp4` | CONFIRMED | 1916x1080, 24fps, 5.04s — VIDEO not a still |
 | 8 | The offer — R3,500 / $500 still | — | AWAITING still | — |
 | 9 | End card — IDEAS INTO IMPACT still | — | AWAITING still | — |
 
@@ -26,7 +26,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 4 | Reaction — impressed | 2.00s | in 0.70, out 2.70 |
 | 5 | Aslibella | 2.04s | full source; he never turns, no trim needed |
 | 6 | Showcase #2 | 2.50s | in 1.00, out 3.50 |
-| 7 | Mission still | 3.00s | push-in / parallax |
+| 7 | Mission | 3.00s | native push-in, no synthetic move |
 | 8 | Offer still | 2.75s | client asked 2.5-3s, must convert |
 | 9 | End card | 2.00s + 0.6s fade to black | |
 | | **Total** | **~22.49s** | low end of 22-27s — see note |
@@ -55,6 +55,23 @@ Scene 7 push-in. The stills are the only elastic material in the film.
   lower 760px). The scrim is needed: the white shirt sits centre-bottom in the
   cropped frame and white text on it would not hold. Face is never covered.
 - Source audio (aac) stripped.
+
+### Scene 7 — CONFIRMED
+- IT IS A VIDEO, NOT A STILL. 1916x1080, 24fps, 5.04s. The brief asked for "a
+  very subtle cinematic push-in/parallax" on a still — unnecessary, the plate
+  already pushes in on its own. No synthetic move will be added.
+- Content: subject walking away into the crowd, low sun ahead. "More Businesses
+  Next.." handwritten at frame right. "CREATE / BUILD / GROW" on a sign at far
+  frame left.
+- WIDEST SOURCE IN THE FILM (16:9). At 9:16 full-bleed only 32% of the width
+  survives — and the handwriting is at frame right, so it is cut completely.
+  Verified: the full-bleed frame contains nothing but his back.
+- "CREATE / BUILD / GROW" IS NOT DELIVERABLE FROM THIS ASSET. It sits at source
+  x=103-221 and is legible only for the first ~0.3s before the push-in carries
+  it out of frame. No card wide enough to include it leaves the rest readable.
+  If that line is wanted it must be typography.
+- Text decay: "More Businesses Next.." holds 0.4s -> 3.4s, fading after.
+  Usable window 0.00 -> 3.20s.
 
 ### Scene 6 — CONFIRMED
 - Brioche & Co Bake House device mockup. Navy/gold, "CINNAMON ROLLS / Like No
@@ -183,6 +200,7 @@ window keeps shrinking:
     Scene 4  CLEAN THROUGHOUT (5.04s) — portrait, no decay
     Scene 5  CLEAN THROUGHOUT (2.02s) — but the source is only 2.02s long
     Scene 6  CLEAN THROUGHOUT (5.04s)
+    Scene 7  clean to 3.20s of 5.04s  (handwriting fades out)
 Scene 4 broke the pattern. Assume Scenes 5-6 may still follow it. Each will be probed for its clean window before
 any timing is promised, and motion-interpolated slow motion is the standing
 remedy where a window is shorter than the beat needs.
@@ -257,6 +275,37 @@ footage cost 11 minutes and 86 Mbps for a single 3s segment. The geq-generated
 scrim was worse — it evaluates a per-pixel expression every frame. Scrim is now
 a pre-baked PNG and the preset is veryfast/CRF 18: the same segment renders in
 2.8s. Final master can afford a slower preset; previews should not.
+
+## FRAMING REVISED — CLIENT FEEDBACK ON LEGIBILITY
+
+Client on the v2 cut: "scenes 5/6 you can't really see the website designs
+because it sits too cropped." Correct, and it is the film's central problem, not
+a detail. The film exists to sell website design; a treatment that makes the
+designs unreadable defeats it. Scene 7 proved the same fault worse — its
+handwriting vanishes entirely at 9:16.
+
+Root cause: applying one framing rule to the whole film. Full-bleed is right for
+the WORLD scenes, where the subject is centred and the frame edges carry nothing.
+It is wrong for the WORK scenes, where the content spreads horizontally.
+
+REVISED GRAMMAR — two treatments, by what the shot is doing:
+  Scenes 1-4  THE WORLD.  Full-bleed 9:16. Immersive, edge to edge. Unchanged.
+  Scenes 5-6  THE WORK.   4:5 card on a darkened, blurred bed of the same frame,
+                          brand name and "built by Vertexia Web Studios" set
+                          beneath in Inter.
+  Scene 7     THE MESSAGE. 1:1 card, biased right to hold the handwriting.
+                          4:5 is too narrow here — it drops either him or the
+                          text.
+
+Width retained, 9:16 full-bleed vs card:
+    Scene 5   47% -> 67%
+    Scene 6   37% -> 53%
+    Scene 7   32% -> 56%  (and the handwriting goes from lost to legible)
+
+This is not a letterbox. The bed is a blurred, darkened grade of the shot itself
+and the dead space carries brand typography, so it reads as a designed portfolio
+card. The shift from full-bleed to card is also dramatically motivated: the film
+moves from being IN the world to LOOKING AT the work.
 
 ## Global decisions — LOCKED
 - MASTER: 1080x1920, 9:16, 24 fps, h264 high, CRF 16, yuv420p. Instagram Reel.
