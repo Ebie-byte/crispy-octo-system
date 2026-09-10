@@ -10,7 +10,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 2 | Journey begins — walking | `scene02_walking.mp4` | CONFIRMED | 1080x1916, 24fps, 5.04s |
 | 3 | City / portfolio transformation | `scene03_city.mp4` | CONFIRMED | 1576x1312, 24fps, 5.04s |
 | 4 | Reaction — impressed, looking around | `scene04_reaction.mp4` | CONFIRMED | 1628x1272, 24fps, 5.04s |
-| 5 | Website showcase #1 — Aslibella | — | AWAITING `scene 5.mp4` | — |
+| 5 | Website showcase #1 — Aslibella | `scene05_aslibella.mov` | CONFIRMED | 1576x1312, 24fps, 2.02s |
 | 6 | Website showcase #2 / final transformation | — | AWAITING `scene 6.mp4` | — |
 | 7 | Mission — CREATE / BUILD / GROW still | — | AWAITING still | — |
 | 8 | The offer — R3,500 / $500 still | — | AWAITING still | — |
@@ -24,15 +24,21 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 2 | Walk | 2.40s | capped by green-spill defect, not by choice |
 | 3 | City transformation | 2.20s | 1.10s source at 50%, capped by billboard decay |
 | 4 | Reaction — impressed | 2.00s | in 0.70, out 2.70 |
-| 5 | Aslibella | ~3.50s | provisional, must end before the turn |
+| 5 | Aslibella | 2.04s | full source; he never turns, no trim needed |
 | 6 | Showcase #2 | ~2.50s | client asked for fast |
 | 7 | Mission still | 3.00s | push-in / parallax |
 | 8 | Offer still | 2.75s | client asked 2.5-3s, must convert |
 | 9 | End card | 2.00s + 0.6s fade to black | |
-| | **Total** | **~23.95s** | inside 22-27s, with room to extend Scenes 5-6 |
+| | **Total** | **~22.49s** | low end of 22-27s — see note |
 
 Scenes 3-6 are provisional and will be set from the real footage — cut points
 follow the movement in frame, not the spreadsheet.
+
+RUNTIME NOTE: sources keep coming in shorter than budgeted (Scene 5 is 2.02s
+against 3.50s). The total now sits at the low end of the target. If Scene 6 is
+also short, the recovery options in order of preference are: ease Scene 5 to
+~2.6s for design read time, ease Scene 3 to its 2.88s render, then extend the
+Scene 7 push-in. The stills are the only elastic material in the film.
 
 ## Scene notes
 
@@ -48,6 +54,29 @@ follow the movement in frame, not the spreadsheet.
 - Text sits over a soft bottom scrim (black, alpha ramped to 0.88 over the
   lower 760px). The scrim is needed: the white shirt sits centre-bottom in the
   cropped frame and white text on it would not hold. Face is never covered.
+- Source audio (aac) stripped.
+
+### Scene 5 — CONFIRMED
+- Aslibella Lash Studio storefront. Black/pink design, "ASLIBELLA LASH STUDIO"
+  wordmark, "Enhance Your Natural Beauty", Book Appointment, feature icons, the
+  lash model image and the "Lashes that speak for you" side panel. Matches brief.
+- HE NEVER TURNS AROUND. Checked every sampled frame to the final one at 2.02s —
+  he stays in profile / back to camera throughout. The source is already trimmed,
+  so the "cut before I turn around" instruction needs no action.
+- SHORTEST SOURCE SO FAR: 2.02s, against a 3.50s budget. No decay in it though —
+  the wordmark and headline stay crisp to the last frame.
+- Source 1576x1312 landscape, crop to 1080 of a 2306-wide scaled frame.
+- DYNAMIC CROP. The camera pushes in during the clip, so a fixed crop that frames
+  the headline at the start clips it by the end: at x=420 "Natural Beauty" runs
+  off the right edge by t=1.6. The crop therefore drifts left as the push-in
+  happens, x = 420 -> 210 across the clip, holding the headline fully in frame
+  throughout. Verified at t=0.1, 1.0 and 1.9.
+  This is a counter-move against camera motion already in the plate, not an added
+  camera move — the framing stays still while the lens comes in.
+- He walks into the headline slightly at the end. That is natural occlusion and
+  reads as intended.
+- Runs at natural speed, 2.04s. Could be eased to ~2.6s if the design needs more
+  read time; deferred until Scene 6 lands and the total is known.
 - Source audio (aac) stripped.
 
 ### Scene 4 — CONFIRMED (reframed by client)
@@ -130,6 +159,7 @@ window keeps shrinking:
     Scene 2  clean to 2.40s of 5.04s  (green spill on the jacket)
     Scene 3  clean to 1.10s of 5.04s  (billboard content dissolves)
     Scene 4  CLEAN THROUGHOUT (5.04s) — portrait, no decay
+    Scene 5  CLEAN THROUGHOUT (2.02s) — but the source is only 2.02s long
 Scene 4 broke the pattern. Assume Scenes 5-6 may still follow it. Each will be probed for its clean window before
 any timing is promised, and motion-interpolated slow motion is the standing
 remedy where a window is shorter than the beat needs.
