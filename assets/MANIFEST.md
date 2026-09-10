@@ -9,7 +9,7 @@ Target runtime 22-27s. Assembly begins only when all 9 slots are CONFIRMED.
 | 1 | Hook — close-up + text | `scene01_closeup.MOV` | CONFIRMED | 1440x1440, 24fps, 4.11s |
 | 2 | Journey begins — walking | `scene02_walking.mp4` | CONFIRMED | 1080x1916, 24fps, 5.04s |
 | 3 | City / portfolio transformation | `scene03_city.mp4` | CONFIRMED | 1576x1312, 24fps, 5.04s |
-| 4 | Vertexia storefront reveal | — | AWAITING `scene 4.mp4` | — |
+| 4 | Vertexia storefront reveal | **MISMATCH** | BLOCKED | file sent is the Good Design portrait, not the storefront |
 | 5 | Website showcase #1 — Aslibella | — | AWAITING `scene 5.mp4` | — |
 | 6 | Website showcase #2 / final transformation | — | AWAITING `scene 6.mp4` | — |
 | 7 | Mission — CREATE / BUILD / GROW still | — | AWAITING still | — |
@@ -49,6 +49,26 @@ follow the movement in frame, not the spreadsheet.
   lower 760px). The scrim is needed: the white shirt sits centre-bottom in the
   cropped frame and white text on it would not hold. Face is never covered.
 - Source audio (aac) stripped.
+
+### Scene 4 — MISMATCH, SLOT STILL EMPTY
+- File received: `scene04_storefront.mp4`, 1628x1272 landscape, 24fps, 5.04s.
+- CONTENT DOES NOT MATCH THE SLOT. The brief for Scene 4 is the VERTEXIA
+  STOREFRONT — the shopfront with the blue/purple logo and window text, the beat
+  that tells the viewer who is behind the websites. This file contains no
+  storefront at any point. Checked t=0.0, 0.6, 1.2, 1.8, 2.6, 3.6, 5.0.
+- What the file actually is: the "Good Design Builds Bigger Businesses" portrait
+  — Scene 10 of the original 12-scene brief. Subject in profile looking off-left
+  with the wall sign behind, turning to face camera by ~2.6s and holding.
+- The sign is legible only 0.00 -> 0.30s. By 0.40s it is blurring, by 0.60s the
+  camera has drifted right and it is out of frame entirely.
+- WORSE, UNDER TREATMENT A: the 9:16 full-bleed crop removes the sign completely.
+  Tested x=400 (partial letters, subject badly placed) and x=688 (sign gone,
+  strong portrait). There is no crop that holds both the sign and the subject.
+  In a vertical master this clip cannot deliver that line as on-screen text.
+  If the line is wanted, it has to be typography, not the wall sign.
+- The clip is still a strong asset: the turn to camera is a natural address-the-
+  viewer beat and belongs late, just before the offer — not at position 4.
+- Kept in `assets/` pending a decision. Not assigned to a slot.
 
 ### Scene 3 — CONFIRMED
 - Cape Town. Subject from behind, Table Mountain centre, Vertexia billboard far
@@ -104,6 +124,7 @@ window keeps shrinking:
     Scene 1  clean throughout (4.11s)
     Scene 2  clean to 2.40s of 5.04s  (green spill on the jacket)
     Scene 3  clean to 1.10s of 5.04s  (billboard content dissolves)
+    Scene 4* clean to 0.30s of 5.04s  (wall sign leaves frame)  *misfiled clip
 Assume Scenes 4-6 do the same. Each will be probed for its clean window before
 any timing is promised, and motion-interpolated slow motion is the standing
 remedy where a window is shorter than the beat needs.
