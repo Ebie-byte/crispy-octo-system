@@ -105,3 +105,92 @@ rows survived.
   `billing_status='cancelled'` but does not touch `invoices`/`payments`; nothing
   links a recurring schedule to a Vee client yet.
 - **The separate Vee Clients privacy/access-log spec.** Deliberately untouched.
+
+---
+
+## Correction: the earlier "anon revoked" claim was wrong
+
+The first migration ran `revoke execute ... from anon`. That was a no-op. Postgres
+grants EXECUTE on a new function to `PUBLIC`, and `anon` inherits it — revoking
+from `anon` alone leaves the `PUBLIC` grant in place. Verified after the fact:
+`has_function_privilege('anon', ..., 'EXECUTE')` was still `true` on all five.
+
+They were never actually callable by anon — `is_staff()` in each body rejected a
+null-uid caller — but the protection was one layer, not the two claimed. Now fixed
+properly: revoked from `PUBLIC` and `anon`, granted to `authenticated` and
+`service_role` only, and re-applied after each `CREATE OR REPLACE` (which resets
+grants to the default).
+
+## The founder had no way to call any of this
+
+`is_staff()` is false wherever there is no JWT, which includes the Supabase SQL
+editor. With no dashboard UI built, that left zero working paths to pause or
+cancel a client. The guard is now `can_manage_vee_clients()`:
+
+```sql
+select auth.uid() is null or public.is_staff();
+```
+
+Null-uid means a privileged context — SQL editor, service_role, an edge function.
+That is only safe *because* the grants above now stop `anon`, which is also a
+null-uid caller. The two changes had to land together.
+
+Verified, all four caller types:
+
+| Caller | Result |
+| --- | --- |
+| No JWT (SQL editor) | works |
+| Founder, signed in | works — pause logged, attributed to their uid |
+| Signed in, not staff | blocked: "Only Vertexia staff can…" |
+| anon (publishable key) | blocked: permission denied for function |
+
+## Interim: running these before the UI exists
+
+Supabase → SQL Editor:
+
+```sql
+select id, business_name, lifecycle_status, billing_status, is_paused
+  from vee_clients order by created_at desc;
+
+select provision_vee_client_dashboard('<id>');   -- Pro only, before approving
+select approve_vee_client_live('<id>');          -- draft -> live
+select pause_vee_client('<id>', true);           -- true = pause billing too
+select resume_vee_client('<id>');
+select cancel_vee_client('<id>', 'too_expensive');
+```
+
+## How these wire into buttons later
+
+Every action is one `supabase.rpc()` call — no extra frontend plumbing:
+
+| Button | Call |
+| --- | --- |
+| Approve & go live | `supabase.rpc('approve_vee_client_live', { client_id })` |
+| Provision dashboard | `supabase.rpc('provision_vee_client_dashboard', { client_id })` |
+| Pause | `supabase.rpc('pause_vee_client', { client_id, pause_billing })` |
+| Resume | `supabase.rpc('resume_vee_client', { client_id })` |
+| Cancel (with reason) | `supabase.rpc('cancel_vee_client', { client_id, reason })` |
+
+Errors come back as readable sentences, so the UI can surface `error.message`
+directly rather than mapping codes.
+
+## Blocking issue for whoever builds that UI
+
+The Vee Clients page **already has a destructive button**, and it is not Cancel:
+
+```js
+async function Rwe(e){ const {error:t} = await We.from("vee_clients").delete().eq("id",e); ... }
+```
+
+confirmed with `Remove ${business_name} from Vee Clients? This can't be undone.`
+
+That is a hard DELETE. It destroys the row, so it bypasses the 60-day
+`retain_until` retention, loses `cancel_reason`, and orphans `pause_events`. It is
+reachable today by any authenticated user (`vee_clients` RLS is still ALL/true),
+and it is the only stop-action on that page — so it is the button a founder would
+naturally reach for when a client cancels.
+
+**When the UI lands, that delete must be replaced by Cancel**, not sit beside it.
+Optionally also block the hard delete at the database level for any client that
+has ever gone live. Not applied yet — flagged rather than done, since it was not
+in the agreed priority order.
